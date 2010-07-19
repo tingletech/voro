@@ -1,0 +1,261 @@
+## Rakefile to run the voro flow
+# Brian Tingle 2008/March, April
+
+# This Rakefile replaces the voro flow in the job scheduler
+# it will be run from cron thusly
+# 00 18 * * 5 /voro/code/wrappers/bin/cronic /voro/local/bin/rake -f /voro/code/rake/Rakefile
+# http://habilis.net/cronic/ was modified to log in /voro/var/log/
+# add some locking?
+
+# default task -- do it all from cron
+# why not use dependencies?  
+# I want to be able to re-run the sub-parts independently in the case of a botched build
+
+ENV['PERL5LIB'] = '/voro/local/perllib:/voro/local/perllib/lib/site_perl/5.8.4/sun4-solaris-64int:/voro/local/perllib/lib/site_perl:/voro/local/perllib/lib/sun4-solaris-64int:/voro/code/batch-bin'
+
+task :default do |t|
+#	Rake::Task["ead:build"].execute does not work
+	Rake::Task["ead:snapshot"].invoke
+	Rake::Task["ead:makemets"].invoke
+	Rake::Task["sync:local"].invoke
+	Rake::Task[:DCme].invoke
+	Rake::Task["ead:pdfsweep"].invoke
+	Rake::Task["ead:oisindex"].invoke
+	Rake::Task["xtf:metsark"].invoke
+ 	Rake::Task["xtf:nonark"].invoke
+ 	Rake::Task["ingest-stats"].invoke
+end
+
+# re-use the TWS wrappers and dependencies
+# (TWS wrappers log things in /voro/var/log)
+namespace :ead do
+	desc "build EAD files"
+	task :build => [:snapshot, :makemets]
+	
+	desc "snapshot the EAD working directory"
+	task :snapshot do |t|
+		sh "/voro/code/wrappers/bin/snapshot"
+		# does a cvs import of what is in /voro/data/oac-ead/[prime2002,remove]
+		# then does a cvs checkout to /voro/workspace/dlxs/oac-ead/[prime2002,remove]
+		# /voro/code/batch-bin/gather_info_for_ead_title_pages.pl \
+		#    /voro/workspace/dlxs/oac-ead/prime2002 \
+		#    /voro/code/htdocs/to-findaid/ead-info.utf8 
+		# perl $VOROBASE/batch-bin/make-repbyarea.pl
+		#	 reads in oac-ead/repodata files 
+		# 	 creates /voro/code/htdocs/xslt/institution-ark2url.xsl
+	end
+	
+	desc "make METS from the EAD"
+	task :makemets => [:snapshot]
+	task :makemets do |t|
+		sh "/voro/code/wrappers/bin/makemets"
+		# Regenerate all METS [VORO update #6]
+		# perl ${VOROBASE}/batch-bin/reMets.pl
+		# reads workspace/dlxs/prime2002 
+		# and outputs METS to /voro/data/oac-ead/data 
+		#
+		# Regenerate METS for removed items (200502)
+		# perl ${VOROBASE}/batch-bin/removeMets.pl
+		# reads workspace/dlxs/remove and 
+		# outputs METS to /voro/data/oac-ead/data
+	end
+
+	desc "sweep pdf files to dynaXML directory structure"
+	task :pdfsweep do |t|
+		# this should be "temporary", I didn't have time
+		# to clean this up, I'd like for PDF to have
+		# the same filename as the EAD
+		sh "/voro/code/batch-bin/pdfDlxs2dyxaXML.pl"
+	end
+
+	desc "build sqlite3 database for ois wsgi service"
+	task :oisindex do |t|
+		# scans files in /voro/XTF/data and uses the django database to build
+		# an sqlite database /voro/code/oac4/ois/ois.sqlite3
+		# used later in prefilter via /wsgi/ois_service.wsgi?ark=&parent_ark=
+		sh "/voro/code/oac4/ois/oisIndexer.csh"
+	end
+
+	# desc "make XTF like tree from the dynaweb path source files"
+	# task :maketranoac => [:snapshot, :makemets]
+	# task :maketranoac do |t|
+		# sh "/voro/code/wrappers/bin/maketranoac"
+		# # perl $VOROBASE/batch-bin/dlxs2dynaXML.pl
+	# end
+end
+
+namespace :deploy do
+	desc "sync data to production"
+	task :data do |t|
+		src_dir = "/voro/XTF/data/"
+		targ_dir = "texts@content.cdlib.org:/texts/data"
+		cvs_opts = "--cvs-exclude --links --recursive --times"
+		sh "rsync #{cvs_opts} #{src_dir} #{targ_dir}" 
+	end
+	desc "sync data-nonark to production"
+	task "data-nonark" do |t|
+		src_dir = "/voro/XTF/data-nonark/"
+		targ_dir = "texts@content.cdlib.org:/texts/data-nonark"
+		cvs_opts = "--cvs-exclude --links --recursive --times"
+		sh "rsync #{cvs_opts} #{src_dir} #{targ_dir}" 
+	end
+	desc "sync index to production"
+	task :index do |t|
+		src_dir = "/voro/XTF/xtf/index/"
+		targ_dir = "texts@content.cdlib.org:/texts/xtf/index-flip"
+		cvs_opts = "--cvs-exclude --links --recursive --times"
+		sh "rsync #{cvs_opts} #{src_dir} #{targ_dir}" 
+	end
+end
+
+# This replaces rsync.sh and RSYNCDATA
+namespace :sync do
+	# rsync -Clrt /voro/data/oac-ead/data/ /voro/XTF/data
+	desc "sync to master data dir"	
+	task :local do |t|
+		src_dir = "/voro/data"
+		targ_dir = "/voro/XTF/data"
+		cvs_opts = "--cvs-exclude --links --recursive --times"
+		# these are the dirs in /voro/data that get modified 
+		# by the voro flow
+		dirs = %w{ oac-ead basic xtf-rm }
+		dirs.each do | dir|
+			sh "rsync #{cvs_opts} #{src_dir}/#{dir}/data/ #{targ_dir}" 
+		end
+	end
+	desc "sync older generation LSTA files"
+	task "oac-lsta" do |t|
+		src_dir = "/voro/data/oac-lsta/xtf/data/"
+		targ_dir = "/voro/XTF/data"
+		cvs_opts = "--cvs-exclude --links --recursive --times"
+		sh "rsync #{cvs_opts} #{src_dir} #{targ_dir}" 
+	end
+	desc "run ONCE sync older generation LSTA files"
+	task "oac-ead-with-extract" do |t|
+		src_dir = "/voro/data/oac-ead-with-extract/data/"
+		targ_dir = "/voro/XTF/data"
+		cvs_opts = "--cvs-exclude --links --recursive --times"
+		sh "rsync #{cvs_opts} #{src_dir} #{targ_dir}" 
+	end
+	desc "run ONCE sync older generation text files"
+	task "texts" do |t|
+		src_dir = "/voro/data/texts/data/"
+		targ_dir = "/voro/XTF/data/13030"
+		cvs_opts = "--cvs-exclude --links --recursive --times"
+		sh "rsync #{cvs_opts} #{src_dir} #{targ_dir}" 
+	end
+	desc "run ONCE sync older generation coca files"
+	task "coca" do |t|
+		src_dir = "/voro/data/coca/data/"
+		targ_dir = "/voro/XTF/data/13030"
+		cvs_opts = "--cvs-exclude --links --recursive --times"
+		sh "rsync #{cvs_opts} #{src_dir} #{targ_dir}" 
+	end
+end
+
+# This replaces the DCme TWS shell wrapper
+desc "Create Dublin Core records"
+task :DCme do |t|
+	sh "/voro/XTF/dor/batch-bin/DCme"
+	# 1. create the build-dc.xml ant build file using a perl script
+	#  /voro/mets-support, /voro/workspace/DC/build-dc.xml 
+	#  and /voro/XTF/data  are  hardcoded in DCme perl code
+
+	sh "/cdlcommon/products/bin/ant -f /voro/workspace/DC/build-dc.xml"
+	# 2. run ant; needs ant >= 1.6.0
+	# works on files in /voro/XTF/data; puts .dc.xml in the same tree
+end
+
+# these tasks do the XTF indexing and replace the shell wrappers
+# that were in /xtf/bin/index* (but are for the /voro/XTF/ version of the index
+namespace :xtf do
+	# common XTF task variables
+	xtf_home = "/voro/XTF/xtf"
+	textIndexer = "#{xtf_home}/bin/textIndexer"
+
+	desc "index-flip Index METS, TEI, EAD with ARKs"
+	task "metsark-flip" do |t|
+		flip_conf = "#{xtf_home}/conf/flip.conf"
+		sh "#{textIndexer} -config #{flip_conf} -index cdl"
+#		sh "#{textIndexer} -config #{flip_conf} -nooptimize -noupdatespell -index cdl"
+	end
+
+	desc "Index METS, TEI, EAD with ARKs"
+	task :metsark do |t|
+		sh "#{textIndexer} -index cdl"
+#		sh "#{textIndexer} -nooptimize -noupdatespell -index cdl"
+	end
+
+	desc "flip Index Non-ARK things"
+	task "nonark-flip" do |t|
+		flip_conf = "#{xtf_home}/conf/flip-nonark.conf"
+		#dirs = %w{ lii } 
+		# OAC 4.0 will need
+		dirs = %w{ lii marc }
+		dirs.each do | dir|
+			sh "#{textIndexer} -config #{flip_conf} -dir #{dir} -index cdl"
+		end
+	end
+
+	desc "Index Non-ARK things"
+	task :nonark do |t|
+		flip_conf = "#{xtf_home}/conf/textIndexer-nonark.conf"
+		# dirs = %w{ lii } 
+		# OAC 4.0 will need
+		dirs = %w{ lii marc }
+		dirs.each do | dir|
+			sh "#{textIndexer} -config #{flip_conf} -dir #{dir} -index cdl"
+		end
+	end
+
+end
+
+# do the QA testing here
+namespace :test do
+	date = `/usr/bin/date +%y%m%d_%H%M%S`
+	searches = "/voro/code/batch-bin/searches"
+	# will need the full path to java to run from cron
+	command = %Q{java -classpath "/voro/XTF/xtf/WEB-INF/classes:/voro/XTF/xtf/WEB-INF/lib/servlet.jar}
+	command += %Q{:/voro/XTF/xtf/WEB-INF/lib/cql-java.jar:/voro/XTF/xtf/WEB-INF/lib/Tidy.jar}
+	command += %Q{:/voro/XTF/xtf/WEB-INF/lib/marc4j.jar:/voro/XTF/xtf/WEB-INF/lib/saxonb-8.9.jar}
+	command += %Q{:/voro/XTF/xtf/WEB-INF/lib/lucene-core-2.1.0.jar:/voro/XTF/xtf/WEB-INF/lib/PDFBox-0.7.2.jar"}
+	command += %Q{ -Xms50m -Xmx1000m -Dxtf.home="/voro/XTF/xtf" -DentityExpansionLimit=128000}
+	command += %Q{ -enableassertions org.cdlib.xtf.cdlTest.RunQACrossQuerySearches}
+	compare = "/voro/code/batch-bin/compare_runs.pl"
+	xtf_dir = "/voro/XTF/xtf"
+	work_dir = "/voro/workspace/QA"
+
+	desc "run test searches on the flip index"
+	task "index-flip" do |t|
+		sh "#{command} #{searches} #{work_dir}/res_index-flip #{xtf_dir} index-flip"
+	end
+	desc "run test searches on the main index"
+	task :index do |t|
+		sh "#{command} #{searches} #{work_dir}/res_index #{xtf_dir}"
+	end
+	desc "comapre test runs"
+	task :compare do |t|
+		sh "#{compare} #{work_dir}/res_index #{work_dir}/res_index-flip"
+	end
+end
+
+# build bdb for old mod_perl based system
+namespace :ark do
+	command = %Q{/usr/bin/perl -I/voro/code/dor/pm /voro/code/dor/batch-bin/extractDC.pl} 
+	# processes /voro/XTF/xtf/data and 
+	# creates /voro/ark/bdb/new.cdldc.bdb
+	desc "build bdb file for mod_perl CMS"
+	task :build do |t|
+		sh "#{command}"
+	end
+
+	desc "scp the index file to mod_perl CMS"
+	task :deploy do |t|
+		sh "scp /voro/ark/bdb/new.cdldc.bdb ark@ark-s10stg.cdlib.org:/ark/indexes/bdb"
+	end
+end
+
+desc "run the ingest stats reports"
+task "ingest-stats" do |t|
+	sh "/voro/code/batch-bin/voro_ingest_stats.pl"
+end
