@@ -1,0 +1,124 @@
+#!/bin/sh
+
+# 2007/8/14 - MAR - Modified to gathering the finding aid title information,
+#		and "scp" it to "oac.cdlib.org".
+
+# 2008/6/9 - MAR - Changed destination account from  "oac@oac.cdlib.org" to
+#               "findaid@oac.cdlib.org".
+
+
+
+# Call setup program. Assumes location is VORO wrapper root.
+root=`dirname $0`;
+. $root/../setup.sh
+
+notifyOps () {
+	voromail "$1"
+	echo $1 2>&1 | tee -a $LOGFILE
+}
+LOGFILE=${LOGDIR}/snapshot_${TIMESTAMP}
+
+# CVS Commit [VORO update #1]
+cd $CDLDATA/prime2002
+cvs -d /voro/cvsdata import -m "auto $DATE" oac-ead/prime2002 voro r$DATE >> $LOGFILE 2>&1
+if [ $? -ne 0 ]; then
+	notifyOps "[ERROR] SNAPSHOT cvs import. See log: $LOGFILE"
+	exit 1
+fi
+
+# CVS Commit [VORO update #1]
+cd $CDLDATA/remove
+cvs -d /voro/cvsdata import -m "auto $DATE" oac-ead/remove voro r$DATE >> $LOGFILE 2>&1
+if [ $? -ne 0 ]; then
+	notifyOps "[ERROR] SNAPSHOT cvs import. See log: $LOGFILE"
+	exit 1
+fi
+
+# CVS Commit [VORO update #1]
+cd $CDLDATA/submission
+cvs -d /voro/cvsdata import -m "auto $DATE" oac-ead/submission voro r$DATE >> $LOGFILE 2>&1
+if [ $? -ne 0 ]; then
+	notifyOps "[ERROR] SNAPSHOT cvs import. See log: $LOGFILE"
+	exit 1
+fi
+
+# CVS Update [VORO update #1]
+cd $CDLDLXS
+rm -rf last-prime2002
+mv prime2002 last-prime2002
+rm -rf last-remove
+mv remove last-remove
+cd ..
+cvs -d /voro/cvsdata checkout -r r$DATE oac-ead/prime2002 oac-ead/remove >> $LOGFILE 2>&1
+if [ $? -ne 0 ]; then
+	notifyOps "[ERROR] SNAPSHOT cvs update. See log: $LOGFILE"
+	exit 1
+fi
+
+# 2007/8/14 - MAR - Gather the finding aid title information.  The directory
+#	that contains the info is "/voro/workspace/dlxs/oac-ead/prime2002",
+#	and we'll create a temp file for the output.
+/voro/code/batch-bin/gather_info_for_ead_title_pages.pl \
+	/voro/workspace/dlxs/oac-ead/prime2002 \
+	/var/tmp/ead-info.txt >> $LOGFILE 2>&1
+if [ $? -ne 0 ]; then
+	notifyOps "[ERROR] SNAPSHOT gather_info_for_ead_title_pages.  See log:  $LOGFILE"
+	exit 1
+	fi
+#	and "SCP" the temp file to "oac.cdlib.org".
+$SCP /var/tmp/ead-info.txt findaid@oac.cdlib.org:ead-info.txt >> $LOGFILE 2>&1
+if [ $? -ne 0 ]; then
+	notifyOps "[ERROR] SNAPSHOT scp of ead-info.txt.  See log:  $LOGFILE"
+	exit 1
+	fi
+# 2008/1/30 - MAR - Make the file available on the web too.
+/bin/cp /var/tmp/ead-info.txt /voro/prd1/voro/htdocs/workspace/ead-info.utf8
+# End of addition 2008/1/30 - MAR
+#	and delete the temp file.
+/bin/rm /var/tmp/ead-info.txt
+# End of addition 2007/8/14 - MAR
+
+# Create and deliver repbyarea table
+cd $VOROBASE/batch-bin		# Needed to find UseBatch.pm
+perl $VOROBASE/batch-bin/make-repbyarea.pl > $CONFDIR/repbyarea.poi.url.txt.LATEST
+if [ $? -ne 0 ]; then
+	notifyOps "[ERROR] SNAPSHOT make-repbyarea.pl. See log: $LOGFILE"
+	exit 1
+fi
+$SCP $CONFDIR/repbyarea.poi.url.txt.LATEST findaid@oac.cdlib.org:${FINDAID}
+rm $CONFDIR/repbyarea.poi.url.txt.LATEST
+
+# Update latest eadXX
+echo "ead${DATE}" > $CONFDIR/latest
+$SCP $CONFDIR/latest findaid@oac.cdlib.org:${FINDBASE}/conf/latest
+if [ $? -ne 0 ]; then
+	notifyOps "[ERROR] SNAPSHOT scp EAD. See log: $LOGFILE"
+	exit 1
+fi
+
+
+# Default is success
+status=0
+
+# Create directories for indexes on findaid [VORO update #7.3]
+$SSH -l oac oac.cdlib.org "mkdir -p ${FINDAID}/ead${DATE}"
+if [ $? -ne 0 ]; then
+	status=1
+fi
+$SSH -l oac oac.cdlib.org "mkdir -p ${FINDAID}/ead${DATE}/bdb"
+if [ $? -ne 0 ]; then
+	status=1
+fi
+
+if [ $status -ne 0 ]; then
+	notifyOps "[ERROR] SNAPSHOT ssh. See log: $LOGFILE"
+        exit 1
+fi
+
+# If successful, then notify users to validate CVS results.
+# Future processing will not continue until this is done.
+# - TWS VORO_PRD prompt attention
+# removed 3/21/05 SR per MR
+# echo "[ATTENTION] SNAPSHOT successful." | mailx -s "[ATTENTION] SNAPSHOT cvs" $VOROMAIL
+
+exit 0
