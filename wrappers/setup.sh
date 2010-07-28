@@ -1,20 +1,19 @@
 #!/bin/sh
 
 # voro env
-VOROBASE=/voro/prd1/voro
+VOROBASE=$HOME/branches/production/voro
 CONFDIR=${VOROBASE}/wrappers/conf
 BINDIR=${VOROBASE}/wrappers/bin
-LOGDIR=${VOROBASE}/wrappers/log
-CDLDATA=/voro/data/oac-ead
-CDLDLXS=/voro/workspace/dlxs/oac-ead
-OACDATA=/voro/workspace/dlxs/oac-ead
-FINDAID=/findaid
-FINDBASE=/findaid/prd1/wrappers
+LOGDIR=$HOME/log/wrappers/log
+CDLDATA=$HOME/data/in/oac-ead
+CDLDLXS=$HOME/workspace/dlxs/oac-ead
+OACDATA=$HOME/workspace/dlxs/oac-ead
+
 export VOROBASE CONFDIR BINDIR LOGDIR CDLDATA CDLDLXS OACDATA FINDAID FINDBASE
 
 # system env
 TIMESTAMP=`date +%y%m%d_%H%M%S`; export TIMESTAMP
-PREFIX=/voro/local
+PREFIX=$HOME/local
 PATH=$PREFIX/bin:/usr/bin:/usr/ucb:/usr/bin/X11:/usr/local/bin:/usr/local/bin:/usr/ccs/bin
 LD_LIBRARY_PATH=$PREFIX/lib:/usr/local/lib
 PERL5LIB=$PREFIX/lib/perl5\:$PREFIX/lib/perl5/site_perl
@@ -24,15 +23,15 @@ DATE=`date +%Y%m%d`
 export PREFIX PATH LD_LIBRARY_PATH PERL5LIB SSH SCP DATE
 
 # simple checks
-if [ `whoami` = voro ]; then
+if [ `whoami` = dsc ]; then
 	echo "[INFO] voro setup executed at timestamp: $TIMESTAMP"
 else
-	echo "[ERROR] Must run as user: voro"
+	echo "[ERROR] Must run as user: dsc"
 	exit 1
 fi
 
 # mail setup
-VOROMAIL='Mark.Reyes@ucop.edu'		# default
+VOROMAIL='brian.tingle@ucop.edu'		# default
 MAILFILE=$CONFDIR/mail.dat
 export VOROMAIL MAILFILE
 if [ -f $MAILFILE ]; then
