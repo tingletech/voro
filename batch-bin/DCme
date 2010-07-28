@@ -1,0 +1,129 @@
+#!/bin/env perl
+# new version of METS to DC batch process
+use Data::Dumper;
+use XML::LibXML;
+my $parser = XML::LibXML->new();
+use XML::LibXML::XPathContext;
+use File::Path;
+
+my $buildfile = "/voro/workspace/DC/build-dc.xml";
+
+# lets play nice
+setpriority( "PRIO_PROCESS", 0 , "19") || die ("$0: $! not nice\n");
+
+#use Getopt::Long;
+#$ret = GetOptions qw(--force+);
+
+#default (no ARGVs) is to grab METS out of this XTF directory
+my $texts_data = $ENV{XTF_DATA} || "/voro/XTF/data";
+my $mets_base = $ENV{METSBASE} || "/voro/mets-support";
+
+#read driver file
+die ("No driver.xml in $mets_base") unless -e "$mets_base/driver.xml";
+my $driver = $parser->parse_file("$mets_base/driver.xml");
+
+#my $texts_dc = $ENV{XTF_DC} || "/texts/data";
+# http status_line on HTTP::Request objects logged here
+#open (ERR, ">/texts/tmp/thumblog.http.errors");
+open (BUILD, ">$buildfile");
+
+my $now = localtime;
+# start printing the XML file
+
+print BUILD <<EOF;
+
+<project name="DCme" default="DCme">
+   <description>
+	This ant build.xml file is created by the perl script $0.
+	This build.xml started at $now
+	run 'ant' to build the .dc files in /texts/data format delivery.
+   </description>
+	<property name="ant" value="org.apache.tools.ant.launch.Launcher"/>
+	<property name="metsBase" location="$mets_base"/>
+	<property name="saxon" location="/voro/XTF/xtf/WEB-INF/lib/saxonb-8.9.jar"/>
+	<property name="this.cp" value="\${saxon}:\${java.class.path}"/>
+
+ <target name="DCme">
+EOF
+
+# first loop
+# the build.xml makes ~150k xslt tasks; needs to be split, so ant calls itself over ant over
+foreach my $i (qw(0 1 2 3 4 5 6 7 8 9 b c d f g h j k m n p q r s t v w x z)) {
+	foreach my $j (qw(0 1 2 3 4 5 6 7 8 9 b c d f g h j k m n p q r s t v w x z)) {
+	   foreach my $NAAN ("13030", "28722", "20775") {
+		if (-e "$texts_data/$NAAN/$i$j") {
+			print BUILD q{<java classname="${ant}" classpath="${this.cp}" fork="true" logError="true" maxmemory="1g">};
+			print BUILD qq{<arg value="-f"/><arg value="$buildfile"/><arg value="$NAAN$i$j"/></java>\n};
+		}
+	   }
+	}
+}
+
+print BUILD "</target>\n";
+
+foreach my $NAAN ("13030", "28722", "20775") {
+	# directory trolling
+	# my $NAAN = "13030";
+	opendir (SUB, "$texts_data/$NAAN");
+	# second loop 
+	while (my $repdir = readdir(SUB)) {
+                next if ($repdir eq "." || $repdir eq ".." || $repdir eq "CVS");
+		opendir (OBJ, "$texts_data/$NAAN/$repdir");
+		print BUILD qq{<target name="$NAAN$repdir">\n};
+		# third loop
+		while (my $objid = readdir(OBJ)) {
+                	next if ($objid eq "." || $objid eq ".." || $objid eq "CVS");
+			my $file = "$texts_data/$NAAN/$repdir/$objid/$objid.mets.xml";
+			# prints a line to the build file
+			upfile ($file) if (-e $file);
+		}
+		print BUILD "</target>\n\n";
+	}
+}
+
+#will work with /texts/data/??/*/*.mets.xml or filename
+#upfile(@ARGV);
+
+print BUILD "</project>\n";
+
+#system("ant");
+exit;
+
+# main routine
+sub upfile {
+  for ( @_ ) {
+	my $doc = $parser->parse_file($_);
+	if (!$doc) {
+		print STDERR "$_ not XML?\n";
+		next;
+	}
+	# register xpath context for the METS we just loaded
+	my $xc = XML::LibXML::XPathContext->new($doc);
+	$xc->registerNs('mets', 'http://www.loc.gov/METS/');
+	$xc->registerNs('cdl', 'http://www.cdlib.org/');
+	# Am I a METS document?
+	if (!($xc->findnodes("/mets:mets"))) {
+		print STDERR "$_ not a METS?\n";
+		next;
+	}
+
+	# use  PROFILE in the driver file to look up the XSLT
+	my $profile = $xc->findvalue(q{/mets:mets/@PROFILE}) ;
+	my $dcx = $driver->findvalue(
+		qq{/mets-profiles/mets-profile-driver[PROFILE="$profile"]/
+				tool[\@type='xslt'][\@role='toQDC']}
+	);
+	# figure out filename for .dc.xml file
+	my $out = $_;
+	$out =~ s,/(.*)\.mets\.xml$,/$1.dc.xml,;
+	$out =~ s,^/voro/out/texts/,/voro/out/texts-dc/,;
+	die ("same name for in and out") if ($_ eq $out);
+	# check that the files exist
+	if ( -e "$mets_base/$dcx" && $dcx){
+		print BUILD qq{<xslt in="$_" out="$out" style="\${metsBase}/$dcx"><classpath location="\${saxon}"/><factory name="net.sf.saxon.TransformerFactoryImpl"/></xslt>\n } 
+	} else {
+		#print STDERR "$profile what what what $0: $! $_ $mets_base/$dcx\n";
+	}
+  }
+}
+
