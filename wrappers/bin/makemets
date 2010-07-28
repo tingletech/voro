@@ -10,11 +10,6 @@ notifyOps () {
 }
 LOGFILE=${LOGDIR}/makemets_${TIMESTAMP}
 
-if [ -d ${OACDATA}/mets ]; then
-	rm -rf ${OACDATA}/mets     # Start from clean slate
-	echo "Cleaning previous mets directory in preparation for build."
-fi
-
 # Regenerate all METS [VORO update #6]
 perl ${VOROBASE}/batch-bin/reMets.pl >> $LOGFILE 2>&1
 if [ $? -ne 0 ]; then
@@ -22,38 +17,11 @@ if [ $? -ne 0 ]; then
         exit 1
 fi
 
-# Regenerate METS for removed items (200502)
-perl ${VOROBASE}/batch-bin/removeMets.pl >> $LOGFILE 2>&1
-if [ $? -ne 0 ]; then
-        notifyOps "[ERROR] MAKEMETS removeMets.pl. See log: $LOGFILE"
-        exit 1
-fi
-
-# Tar and gzip METS files [VORO update #11]
-# NOTE: 11.1 and 11.2 are now done by reMets.pl process
-# $SCP ${OACDATA}/mets-ead.tgz oac@oac.cdlib.org:${FINDAID}/data
-if [ $? -ne 0 ]; then
-        notifyOps "[ERROR] MAKEMETS scp (1). See log: $LOGFILE"
-        exit 1
-fi
-
-# $SCP ${OACDATA}/mets-ead.tgz ark@ark.cdlib.org:/ark/data
-if [ $? -ne 0 ]; then
-        notifyOps "[ERROR] MAKEMETS scp (2). See log: $LOGFILE"
-        exit 1
-fi
-
-# /voro/code/batch-bin/texts/packageBasicMETS.pl
-perl ${VOROBASE}/batch-bin/texts/packageBasicMETS.pl >> $LOGFILE 2>&1
-if [ $? -ne 0 ]; then
-        notifyOps "[ERROR] MAKEMETS packageBasicMETS.pl. See log: $LOGFILE"
-        exit 1
-fi
-
-# Tar and gzip METS files [VORO update #11]
-
-# Check the creation of new directories [VORO update #12]
-# NOTE: Currently done by OAC index process
-echo "VORO update step 12 not currently implmented."
+## # Regenerate METS for removed items (200502)
+## perl ${VOROBASE}/batch-bin/removeMets.pl >> $LOGFILE 2>&1
+## if [ $? -ne 0 ]; then
+        ## notifyOps "[ERROR] MAKEMETS removeMets.pl. See log: $LOGFILE"
+        ## exit 1
+## fi
 
 exit 0
