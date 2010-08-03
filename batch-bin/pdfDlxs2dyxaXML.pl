@@ -10,8 +10,8 @@ use File::Path;
 use XML::LibXML;
 use XML::LibXSLT;
 
-$eadroot = $ENV{OACDATA} || "/voro/data/oac-ead";
-$dynaroot = $ENV{DYNROOT} || "/voro/XTF/data";
+$eadroot = $ENV{OACDATA} || "$ENV{HOME}/data/in/oac-ead";
+$dynaroot = $ENV{DYNROOT} || "$ENV{HOME}/data/xtf";
 
 sub poi2pdf {
 	#print Dumper @_;
@@ -30,12 +30,7 @@ sub poi2pdf {
 use Getopt::Long;
 $ret = GetOptions qw(--onefile+);
 
-
-#$ENV{OACDATA} = "/voro/data/oac-ead";
-# use OacBatch;
-
 $| = "1";
-
 
 local $parser = XML::LibXML->new() || die ("$0: could not make new parser");
 
