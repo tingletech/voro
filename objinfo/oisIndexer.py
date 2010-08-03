@@ -7,17 +7,19 @@ import glob
 import csv
 import MySQLdb
 
-DIR_ROOT = '/voro/data/oac-ead/prime2002/'
-DB_FILE = '/voro/code/oac4/ois/ois.sqlite3'
+HOME = os.environ['HOME']
+
+DIR_ROOT = HOME + '/data/in/oac-ead/prime2002/'
+DB_FILE = HOME + '/indexes/sqlite3/ois.sqlite3'
 DB_MYSQL_NAME = ''
 DB_MYSQL_USER = ''
 DB_MYSQL_PASSWORD = ''
 DB_MYSQL_HOST = ''
 DB_MYSQL_PORT = ''
-DIR_ORPHANS = '/voro/code/oac4/ois/orphans'
+DIR_ORPHANS =  os.path.realpath(__file__) + '/orphans'
 
 def run_samples():
-    DIR_SAMPLES_ROOT = '/voro/data/oac-ead/prime2002/'
+    DIR_SAMPLES_ROOT = HOME + '/data/in/oac-ead/prime2002/'
     samples = [("A","ark:/13030/tf10000759"),
     ("B","ark:/13030/kt200014h4"),
     ("C","ark:/13030/kt196nc93r"),

@@ -11,9 +11,11 @@ import MySQLdb
 import cgi
 import re
 from xml.sax.saxutils import escape
+import os
 
-DB_SQLITE = '/voro/code/oac4/ois/ois.sqlite3'
-#DB_SQLITE = '/voro/local/wsgi/ois.sqlite3'
+HOME = os.environ['HOME']
+
+DB_SQLITE = HOME + '/index/sqlite3/ois.sqlite3'
 
 DB_MYSQL_NAME = ''
 DB_MYSQL_USER = ''
