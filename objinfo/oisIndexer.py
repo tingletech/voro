@@ -6,16 +6,20 @@ import lxml.etree as ET
 import glob
 import csv
 import MySQLdb
+from config_reader import read_config
 
 HOME = os.environ['HOME']
 
 DIR_ROOT = HOME + '/data/in/oac-ead/prime2002/'
 DB_FILE = HOME + '/indexes/sqlite3/ois.sqlite3'
-DB_MYSQL_NAME = ''
-DB_MYSQL_USER = ''
-DB_MYSQL_PASSWORD = ''
-DB_MYSQL_HOST = ''
-DB_MYSQL_PORT = ''
+db = read_config()
+
+DB_MYSQL_NAME = db['default-ro']['NAME']
+DB_MYSQL_USER = db['default-ro']['USER']
+DB_MYSQL_PASSWORD = db['default-ro']['PASSWORD']
+DB_MYSQL_HOST = db['default-ro']['HOST']
+DB_MYSQL_PORT = db['default-ro']['PORT']
+
 DIR_ORPHANS =  os.path.realpath(__file__) + '/orphans'
 
 def run_samples():
