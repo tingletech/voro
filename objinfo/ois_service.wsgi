@@ -12,17 +12,18 @@ import cgi
 import re
 from xml.sax.saxutils import escape
 import os
+from config_reader import read_config
 
 HOME = os.environ['HOME']
+DB_SQLITE = HOME + '/indexes/sqlite3/ois.sqlite3'
 
-DB_SQLITE = HOME + '/index/sqlite3/ois.sqlite3'
+db = read_config()
 
-DB_MYSQL_NAME = ''
-DB_MYSQL_USER = ''
-DB_MYSQL_PASSWORD = ''
-DB_MYSQL_HOST = ''
-DB_MYSQL_PORT = ''
-
+DB_MYSQL_NAME = db['default-ro']['NAME']
+DB_MYSQL_USER = db['default-ro']['USER']
+DB_MYSQL_PASSWORD = db['default-ro']['PASSWORD']
+DB_MYSQL_HOST = db['default-ro']['HOST']
+DB_MYSQL_PORT = db['default-ro']['PORT']
 
 def lookup_inst_names(ark_parent, ark_grandparent=None):
     '''For given ark, lookup the name in the Django DB
