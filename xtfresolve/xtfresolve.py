@@ -1,4 +1,5 @@
 from lxml import etree
+import os
 import cgi
 import re
 from xml.sax.saxutils import escape
@@ -8,14 +9,14 @@ def poi2file(poi):
     TODO: BETTER ERROR CHECKING?
     
     >>> poi2file('ark:/13030/hb2g5004x8')
-    '/texts/data/13030/x8/hb2g5004x8/hb2g5004x8'
+    '/dsc/data/xtf/data/13030/x8/hb2g5004x8/hb2g5004x8'
     '''
     poi = poi.replace('/','')
     poi = poi.replace('.','')
     dir = poi[-2:]
     #$poi =~ s|ark:(\d\d\d\d\d)(.*)|/texts/data/$1/$dir/$2/$2|;
     result = re.match('ark:(\d\d\d\d\d)(.*)', poi)
-    fpath = ''.join(('/texts/data/', result.group(1), '/', dir, '/',
+    fpath = ''.join(('/dsc/data/xtf/data/', result.group(1), '/', dir, '/',
                     result.group(2), '/', result.group(2), ))
     return fpath
 
@@ -36,28 +37,28 @@ def application(environ, start_response):
     ... 
     >>> application(environ, start_response)
     400 BAD REQUEST
-    [('Content-type', 'text/plain'), ('Content-Length', '17')]
-    ['<h1>NO Query</h1>']
+    [('Content-type', 'text/plain'), ('Content-Length', '24')]
+    ['<h1>NO Query String</h1>']
     >>> environ = {'QUERY_STRING':''}
     >>> application(environ, start_response)
-    400 NO POI
+    400 BAD REQUEST
     [('Content-type', 'text/plain'), ('Content-Length', '30')]
     ['<h1>NO POI Query paramter</h1>']
     >>> environ = {'QUERY_STRING':'POI=ark:/13030/hb2g5004x8&POI=FID5'}
     >>> application(environ, start_response)
-    400 MULTIPLE POI
+    400 BAD REQUEST
     [('Content-type', 'text/plain'), ('Content-Length', '57')]
     ['<h1>More than one  POI Query paramter is not allowed</h1>']
     >>> environ = {'QUERY_STRING':'POI=ark:/13030/hb2g5004x8'}
     >>> application(environ, start_response)
-    400 NO fileID
+    400 BAD REQUEST
     [('Content-type', 'text/plain'), ('Content-Length', '33')]
     ['<h1>NO fileID Query paramter</h1>']
-    >>> environ = {'QUERY_STRING':'POI=ark:/13030/hb2g5004x8&fileID=FID5'}
+    >>> environ = {'QUERY_STRING':'POI=ark:/13030/hb2g5004x8&fileID=FID5',}
     >>> application(environ, start_response)
     302 Found
-    [('Location', 'http://content.cdlib.org/dynaxml/data/13030/x8/hb2g5004x8/files/hb2g5004x8-FID5.jpg'), ('Content-type', 'text/plain'), ('Content-Length', '83')]
-    ['http://content.cdlib.org/dynaxml/data/13030/x8/hb2g5004x8/files/hb2g5004x8-FID5.jpg']
+    [('Location', 'http://cdn-dev.calisphere.org/dynaxml/data/13030/x8/hb2g5004x8/files/hb2g5004x8-FID5.jpg'), ('Content-type', 'text/plain'), ('Content-Length', '88')]
+    ['http://cdn-dev.calisphere.org/dynaxml/data/13030/x8/hb2g5004x8/files/hb2g5004x8-FID5.jpg']
     '''
 
     status = '200 OK'
@@ -93,6 +94,8 @@ def application(environ, start_response):
     node = doc.xpath(xpath, namespaces=namespaces)  
     # what to do if node list len > 1?
     fileurl = re.sub('\s', '+', node[0])
+    # replace host with CDN_HOSTNAME
+    fileurl = re.sub(r'http://.+\.cdlib\.org/', ''.join(('http://', os.environ['CDN_HOSTNAME'], '/')), fileurl)
     output = fileurl
     status = '302 Found'
     response_headers = [('Location', fileurl),
