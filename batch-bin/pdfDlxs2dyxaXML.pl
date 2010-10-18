@@ -11,7 +11,7 @@ use XML::LibXML;
 use XML::LibXSLT;
 
 $eadroot = $ENV{OACDATA} || "$ENV{HOME}/data/in/oac-ead";
-$dynaroot = $ENV{DYNROOT} || "$ENV{HOME}/data/xtf";
+$dynaroot = $ENV{DYNROOT} || "$ENV{HOME}/data/xtf/data";
 
 sub poi2pdf {
 	#print Dumper @_;
