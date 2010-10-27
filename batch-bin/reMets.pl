@@ -18,8 +18,8 @@ use Carp;
 $| = 1;
 
 my $debug="1";
-my $eadroot = "$ENV{OACDATA}";
-my $allroot = "$ENV{ALLDATA}" || "$ENV{HOME}/data/in/oac-ead";
+my $eadroot = "$ENV{OACDATA}" || "$ENV{HOME}/data/in/oac-ead";
+my $allroot = "$ENV{ALLDATA}" || "$ENV{HOME}/data/xtf"; # leave off final /data
         
 
 my $parser = XML::LibXML->new();
@@ -32,22 +32,21 @@ if (@ARGV) {
 	}
 } else {
 
-opendir (BASE, "$eadroot/prime2002") || die ("$! $_ $ENV{OACDATA}/prime2002");
+opendir (BASE, "$eadroot/prime2002") || die ("$! $_ $eadroot/prime2002");
 
 while ( my $subdir = readdir(BASE)) {
         next if ($subdir eq "." || $subdir eq ".." || $subdir eq "CVS");
         #print "subdir $subdir\n";
-        opendir(SUB, "$ENV{OACDATA}/prime2002/$subdir") || die ("$ENV{OACDATA}/prime2002/$subdir $! $_");
+        opendir(SUB, "$eadroot/prime2002/$subdir") || die ("$eadroot/prime2002/$subdir $! $_");
         while (my $repdir = readdir(SUB)) {
                 next if ($repdir eq "." || $repdir eq ".." || $repdir eq "CVS");
                 #print "$repdir\n";
                 if ($repdir =~ m,\.xml$,){
-                        spitMets("$ENV{OACDATA}/prime2002/$subdir/$repdir");
+                        spitMets("$eadroot/prime2002/$subdir/$repdir");
                 } else {
-                        opendir(REP, "$ENV{OACDATA}/prime2002/$subdir/$repdir") || die ("$ENV{OACDATA}/cdlprim
-e/$subdir/$repdir $! $_");
+                        opendir(REP, "$eadroot/prime2002/$subdir/$repdir") || die ("$eadroot/cdlprime/$subdir/$repdir $! $_");
                         while (my $file = readdir(REP)) {
-                                spitMets("$ENV{OACDATA}/prime2002/$subdir/$repdir/$file") if ($file =~ m,\.xml$,)
+                                spitMets("$eadroot/prime2002/$subdir/$repdir/$file") if ($file =~ m,\.xml$,)
 ;
                         }
                 }
@@ -108,6 +107,9 @@ sub spitMets {
 
 	my $cdlprimeStat = stat("$cdlprime");
 	my $metsStat = stat("$xout2.mets.xml");
+	my $xtfEadStat = stat("$xout2.xml");
+
+print "$cdlprime, $xout2\n";
 
 	#write out the METS file
 	if ( ( (@ARGV) || !( -e "$xout2.mets.xml")) || ( $cdlprimeStat->mtime > $metsStat->mtime) ) {
@@ -117,7 +119,9 @@ sub spitMets {
 	}
 
 	# write out the EAD file to the XTF directory
-	$doc->toFile("$xout2.xml");
-	undef $doc;
+	if ( ( (@ARGV) || !( -e "$xout2.xml")) || ( $cdlprimeStat->mtime > $xtfEadStat->mtime) ) {
+		$doc->toFile("$xout2.xml");
+		undef $doc;
+	}
 
 }
