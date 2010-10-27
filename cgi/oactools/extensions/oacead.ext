@@ -1,0 +1,931 @@
+%Extensions = (
+		
+##=================================================##
+## Auto paragraph                                  ##
+##=================================================##
+
+
+'auto_p' =>
+
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	unless ($text) {
+		if ($node_fields) {
+			$text = $node_fields->{$var_name};
+		} else {
+			$text = $post_data->{$var_name};
+		}
+	}
+	if ($text) {
+		$text =~ s/\n +\n/\n\n/g;
+		$text =~ s/\n\t+\n/\n\n/g;
+		$text =~ s/^\s+//g;
+		$text =~ s/\s+$//g;
+		$text =~ s/\n{2,}/<\/p>\n<p>/g;
+		$text =~ s/<p>\s+/<p>/g;
+		$text = "<p>$text</p>";
+	}
+	return $text;
+},
+
+
+
+##=================================================##
+## Auto head                                       ##
+##=================================================##
+
+'auto_head' =>
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields, $element) = @_;
+	unless ($text) {
+		if ($node_fields) {
+			$text = $node_fields->{$var_name};
+		} else {
+			$text = $post_data->{$var_name};
+		}
+	}
+	if ($text =~ /<head>/) {
+		$text =~ s/<p><head>/<head>/g;
+		$text =~ s/<\/head><\/p>/<\/head>/g;
+		$text =~ s/<head>/<\/$element>\n<$element>\n<head>/g;
+		$text =~ s/<\/$element>\n//;
+		$text .= "\n<\/$element>";
+	}
+	return $text;
+},
+
+
+
+##=================================================##
+## Manual input controlaccess                      ##
+##=================================================##
+
+
+'controlaccess_manual' =>
+
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	my $node = $post_tree->{$var_name};
+
+	my %controlaccess_section_types =
+	( '600' => 'Subjects',
+
+	  '610' => 'Subjects',
+	  '611' => 'Subjects',
+	  '630' => 'Subjects',
+	  '650' => 'Subjects',
+	  '651' => 'Subjects',
+	  '652' => 'Subjects',
+	  '653' => 'Subjects',
+	  '654' => 'Subjects',
+	  '691' => 'Subjects',
+	  '692' => 'Subjects',
+	  '693' => 'Subjects',
+	  '694' => 'Subjects',
+	  '695' => 'Subjects',
+	  '696' => 'Subjects',
+	  '697' => 'Subjects',
+	  '698' => 'Subjects',
+	  '699' => 'Subjects',
+	  '655' => 'Genres and Forms of Material',
+	  '656' => 'Occupations',
+	  '657' => 'Functions',
+	  '700' => 'Other Index Terms Related to this Collection',
+	  '710' => 'Other Index Terms Related to this Collection',
+	  '711' => 'Other Index Terms Related to this Collection',
+	  '720' => 'Other Index Terms Related to this Collection',
+
+	  '730' => 'Other Index Terms Related to this Collection',
+	  '740' => 'Other Index Terms Related to this Collection',
+	  '752' => 'Other Index Terms Related to this Collection',
+	);
+	
+	# No more encodinganalog so mangle the above into a single type.
+	# Just delete the following foreach loop to put encodinganalog back in:
+	
+	foreach my $key (keys %controlaccess_section_types) {
+		$controlaccess_section_types{$key} = 'Subjects';
+	}
+	
+	my %sections;
+	while ($node) {
+		my $analog = $node->{fields}->{ANALOG};
+		
+		# No more encodinganalog so mangle the above into a single type.
+		# Delete the following two lines to put it back:
+		$analog = '650';
+		$node->{fields}->{ANALOG} = '650';
+
+		my $section = $controlaccess_section_types{$analog};
+		push @{$sections{$section}}, $node if $node->{fields}->{TEXT};
+		$node = $node->{next};
+	}
+	my $control_access_text;
+	my $hdg_exists;
+	foreach my $section_head ('Subjects', 'Genres and Forms of Material', 'Occupations', 'Functions', 'Other Index Terms Related to this Collection') {
+		my @array = @{$sections{$section_head}};
+		my $section_text;
+		foreach my $node (@array) {
+			my $fields = $node->{fields};
+			if ($fields->{TEXT}) {
+				$hdg_exists = 1;
+			} else {
+				next;
+			}
+			my $text        = $fields->{TEXT};
+			my $tag         = $fields->{TYPE};
+			my $role        = $fields->{ROLE};
+			my $analog      = $fields->{ANALOG};
+			my $type        = $fields->{TYPE};
+			my $source      = $fields->{SOURCE};
+			my $othersource = $fields->{OTHERSOURCE};
+			my $rules       = $fields->{RULES};
+			my $otherrules  = $fields->{OTHERRULES};
+			my $attributes;
+			
+			$attributes     = " encodinganalog=\"$analog\"" if $analog;
+			if ($othersource) {
+				$attributes    .= " source=\"$othersource\"";
+			} elsif ($source) {
+				$attributes    .= " source=\"$source\"";
+			}
+			if ($otherrules) {
+				$attributes    .= " rules=\"$otherrules\"";
+			} elsif ($rules) {
+				$attributes    .= " rules=\"$rules\"";
+			}
+			if ($role =~ /on/i and $tag !~ /^(subject|genreform|occupation|function)$/i) {
+				$attributes    .= " role=\"subject\"";
+			}
+			$section_text  .= "<$tag$attributes>$text</$tag>\n";
+		}
+		if ($section_text) {
+			$section_text = "<controlaccess>\n<head>$section_head</head>\n$section_text</controlaccess>\n";
+			$control_access_text .= $section_text;
+		}
+	}
+	# Turn off encodinganalog
+	$control_access_text =~ s/ encodinganalog="[^"]*"//g;
+	
+	# Get rid of the nesting
+	$control_access_text =~ s/\n?<\/?controlaccess>\n?//g;
+	$control_access_text =~ s/\n?<head>.*<\/head>\n?//g;
+	$control_access_text .= "\n";
+	
+			
+	return $control_access_text if $hdg_exists;
+},
+
+
+
+
+##=================================================##
+## Delete empty attributes post processor          ##
+##=================================================##
+
+
+'clean_attributes' =>
+
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	$text =~ s/\s+[-a-z]+="\s*"//g;
+	$text =~ s/(\s+[-a-z]+=") ([^"\n<>]+")/$1$2/g;
+	return $text;
+},
+
+
+##=================================================##
+## MARC conversion controlaccess                   ##
+## Written by Michael Conkin.                      ##
+##=================================================##
+
+
+'controlaccess_marc' =>
+
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	my $apstring = $post_data->{$var_name};
+	$apstring = $text unless $apstring;
+	my $arrangeflag = 1;
+
+
+	my (@aplist, @accpoints, $marctag, $eadtag, $ind1,
+	   $ind2, $source, $open, $eadacc, $subhead,
+		$hassub, $hasgen, $hasjob, $hasfun, $hasoth,
+		@subjects, @genres, @jobs, @functions, @others);
+
+
+	my @sources = qw(
+		aat     lcsh    nmc
+		aacr2   lctgm   rad
+		cdwa    local   rbgenr
+		dot     mesh    tgn
+		gmgpc   mim     ulan
+		lcnaf   ncarules
+	);
+
+
+	my %tags_6xx = qw(
+		610		corpname
+		611		corpname
+		630		title
+		650		subject
+		651		geogname
+		653		subject
+		654		subject
+		655		genreform
+		656		occupation
+		657		function
+		691		subject
+		692		subject
+		693		subject
+		694		subject
+		695		subject
+		696		subject
+		697		subject
+		698		subject
+		699		subject
+	);
+
+
+	my %tags_7xx = qw(
+
+
+		700		persname
+		710		corpname
+		711		corpname
+		720		name
+		730		title
+		740      title
+		752		geogname
+	);
+
+
+	my $close="<\/controlaccess>\n";
+	my $ho = "<controlaccess>\n<head>";
+	my $hk = "<\/head>";
+	my $subjhead = $ho."Subjects".$hk;
+	my $genhead = $ho."Genres and Forms of Material".$hk;
+	my $jobhead = $ho."Occupations".$hk;
+	my $funhead = $ho."Functions".$hk;
+	my $othhead = $ho."Index Terms Related to this Collection".$hk;
+
+
+	push (@subjects, $subjhead);
+	push (@genres, $genhead);
+	push (@jobs, $jobhead);
+	push (@functions, $funhead);
+	push (@others, $othhead);
+
+
+	my %ind2sources = qw(
+		1		lcsh
+		3		nlsaf
+		4		unspecified
+		5		csh
+		6		rdvm
+		8     sears
+	);
+
+
+# -- String operations:
+
+
+
+
+		$apstring =~ s/ +\n/\n/g;                    # - delete spaces before a newline
+		$apstring =~ s/ ([67]\d\d)/\n$1/g;           # - place a newline before [space]6/7xx (kill the space)
+		$apstring =~ s/\n\n/\n/g;                    # - 2 passes to delete blank lines
+		$apstring =~ s/\n\n/\n/g;
+
+
+		$apstring =~ s/\n \n/\n/g;                   # - delete lines w/1 space
+
+
+		$apstring =~ s/ \n(\S)/ $1/g;                # - connect mid-line (trailing space) breaks
+		$apstring =~ s/(\d{3}):\n {5,6}(.{1,2})\n {7}:/$1 $2/g;
+                                                     # - connects Homer(USC) fields
+
+
+		$apstring =~ s/ {17,}(\d\d\d)/$1/g;          # - deletes extra pre-tag spaces in Melvyl web
+		$apstring =~ s/\n {7,}/ /g;                  # - puts multiline fields on one line
+		$apstring =~ s/ +/ /g;                       # - reduces multiple spaces to 1 space
+		$apstring =~ s/§a //g;                       # - fix WebMelvyl delims
+		$apstring =~ s/§/ß/g;                        # - § converts first to ß
+		$apstring =~ s/\|/\$/g;                      # - Innopac delims
+
+
+	                    # - converts OCLC-style ß
+		$apstring =~ s/, ß[b|c|d|q|e|t|9] /, /g;
+		$apstring =~ s/, ß(.) /,\$$1/g;
+		$apstring =~ s/ ß[v|x|y|z] /--/g;
+		$apstring =~ s/ ß[b|c|d|q|e|t|9] /\. /g;
+		$apstring =~ s/ ß(.) /\$$1/g;
+		$apstring =~ s/ß2/$2/g;
+
+
+		$apstring =~ s/ *Ý *//g;                     # - kills OCLC EOL character
+
+
+								# - convert delimiters
+
+
+		$apstring =~ s/ *\$[v|x|y|z] */--/g;                # - vxyz with or w/o surrounding spaces
+		$apstring =~ s/, *\$[b|c|d|q|e|t|9] */, /g;         # - if already set off by comma
+		$apstring =~ s/\. *\$[b|c|d|q|e|t|9] */\. /g;       # - if already set off by period
+		if ($apstring =~ /[^\.] *\$[b|c|d|q|e|t|9] */) {    # - if neither, add . or ,
+			$apstring =~ s/ *\$[b|e|t|9] */\. /g;
+			$apstring =~ s/ *\$[c|d|q] */, /g;
+		}
+
+
+		$apstring =~ s/---/- --/g;		                 # - open-ended dates												# - fix open-date FB --
+		$apstring =~ s/\$(.) /\$$1/g;                  # - close up, e.g., $2[space]
+		$apstring =~ s/_(\d)/ $1/g;                    # - convert "_"digit to [space]digit
+		$apstring =~ s/(\d)_/$1 /g;                    # - convert digit"_" to digit[space]
+		$apstring =~ s/([67]\d\d)\n/$1/g;              # - delete linebreak between tag and text
+		$apstring =~ s/[,\.]* *\$[3-5].*//g;           # - superfluous $3-$5 end subfields
+		$apstring =~ s/\$w.+//g;                       # - kill $w
+		$apstring =~ s/\n[^(6|7|\*)]+(6|7|\*)/\n$1/g;  # - eliminate pre-tag junk
+		$apstring =~ s/\n(6|7) /\n/g;                  # - delete subfield beginning 6 or 7
+
+
+
+
+		$apstring =~ s/([67]\d\d) {2,}(\d)/$1 $2/g;    # - target extra spaces
+		$apstring =~ s/([67]\d\d \d) {2,}/$1 /g;
+
+
+	@aplist = split("\n",$apstring);						  # - make the string a list
+
+
+	foreach $elt (@aplist) {
+		if ($elt =~ /^[^6|7|\*]/) {
+			$elt =~ s/^[^6|7|\*]+//;
+		}
+
+
+
+
+		if ($elt =~ /^(6\d\d)/) {                       # - work on 6xx first
+			$marctag=$1;
+			if ($elt =~ /^$marctag (\d)(\d)/) {
+				$ind1=$1;
+				$ind2=$2;
+			} elsif ($elt =~ /^$marctag (\d) /) {
+				$ind1=" ";
+				$ind2=$1;
+			}
+			if ($elt =~ /^600/) {                        # - 600: persname or famname?
+				if ($ind1 == 3) {
+					$eadtag="famname";
+				} else {
+					$eadtag="persname";
+				}
+			} else {
+				foreach $key (keys (%tags_6xx)) {
+					if ($key eq $marctag) {
+						$eadtag=$tags_6xx{$key};
+					}
+				}
+			}
+		if ($ind2 == 0) {                            # - 2nd indicator = 0
+
+
+            if ($elt =~ /^65[0|1]/) {
+					$source = " source=\"lcsh\""
+			   } else {
+				   $source=" source=\"lcnaf\"";
+			   }
+
+
+		   } elsif ($ind2 == 2) {                       # - 2nd indicator = 2
+				   $source = " source=\"mesh\""
+			} elsif ($elt =~ /\$2([^ ]+) ?/) {           # - 2nd indicator not 0 or 2, and has $2
+				$s = $1;
+				
+				## No more othersource attribute
+				
+				if (grep(/$s/, @sources)) {
+					$source = " source=\"$s\"";
+				} else {
+					$source=" source=\"$s\"";
+				}
+			} else {                                     # - $2-less 2nd indicators:
+
+
+				if ($ind2 == 7) {                         # - suppress source if _7 and no $2
+					$source = ""
+				} else {
+
+
+					foreach $key (keys (%ind2sources)) {
+						if ($key == $ind2) {
+							$source=" source=\"$ind2sources{$key}\"";
+						}
+					}
+				}
+			}
+		} elsif ($elt =~ /^(7[0-5][0-2])/) {            # - 7xx's, but not all of them
+				$marctag=$1;
+				foreach $key (keys (%tags_7xx)) {
+					if ($key eq $marctag) {
+						$eadtag=$tags_7xx{$key};
+					}
+				}
+				$source=" source=\"aacr2\"";
+		} elsif ($elt =~ /^\*\*/) {                     # - do nested <controlaccess>'s
+																		# - only if auto-align is NOT checked
+
+
+			if ($arrangeflag == 0) {
+				if ($subhead == 1) {
+					$elt =~ s/^\*\* *(.+)/<\/controlaccess>\n<controlaccess>\n<head>$1<\/head>/;
+				} else {
+					$elt =~ s/^\*\* *(.+)/<controlaccess>\n<head>$1<\/head>/;
+					$subhead=1;
+				}
+			} else {
+				$elt =~ s/^\*\*.*//g;                   # - delete the line the **Xxxx is on
+			}
+
+
+		} else {
+				next;
+		}
+
+
+		if ($marctag =~ /6[^5]\d/) {
+			$role = " role=\"subject\"";
+		} else {
+			$role = "";
+		}
+
+
+                                        # - Put it all together
+        
+        # Get rid of encodinganalog
+		$elt =~ s/^\d\d\d ?[\d]* ?(.+)/<$eadtag $source$role>$1<\/$eadtag>/;
+        
+		#$elt =~ s/^\d\d\d ?[\d]* ?(.+)/<$eadtag encodinganalog=\"$marctag\"$source$role>$1<\/$eadtag>/;
+		$elt =~ s/\$[2][^<]+</</;                 # - Kill $2s
+		$elt =~ s/ <[^<]+</</;                    # - Delete Melvyl <BG>-like codes
+		$elt =~ s/ <\//<\//;                      # - No spaces before endtags
+		$elt =~ s/([^\.|\)|\-])<\//$1\.<\//;      # - If no . or ) or - before </, add .
+		$elt =~ s/\.<\/head/<\/head/;             # - If .</head, delete .
+		$elt =~ s/\.\./\./g;                      # - Replace twos periods with one
+
+
+# -- if auto-align, push the line onto either @subjects, @genres, @jobs, @functions, @others
+# -- set has-flag for each section
+
+
+		if ($arrangeflag) {
+
+
+			if ($marctag == 655) {
+				$hasgen=1;
+				push(@genres,$elt);
+			} elsif ($marctag == 656) {
+				$hasjob=1;
+				push(@jobs,$elt);
+			} elsif ($marctag == 657) {
+				$hasfun=1;
+				push(@functions,$elt);
+			} elsif ($marctag > 699) {
+				$hasoth=1;
+				push(@others,$elt);
+			} else {
+				$hassub = 1;
+				push(@subjects,$elt);
+			}
+		} else {
+			push(@accpoints,$elt);
+		}                                            # - Exit the auto-arrange if
+	}																# - Exit the for-loop
+
+
+	if ($subhead == 1) {										# - subhead can only == "1" in the
+		push(@accpoints,$close);                     #   do-NOT-autoarrange context
+	}
+
+
+# - if auto-arrange is on ($arrangeflag = 1), check each of the has-flags; if true,
+# - end each section array with a $close, and append each to the @accpoints array
+
+
+	if ($arrangeflag) {
+		if ($hassub) {
+			push(@subjects,$close);
+			push(@accpoints,@subjects);
+		}
+		if ($hasgen) {
+			push(@genres,$close);
+			push(@accpoints,@genres);
+		}
+		if ($hasjob) {
+			push(@jobs,$close);
+			push(@accpoints,@jobs);
+		}
+		if ($hasfun) {
+			push(@functions,$close);
+			push(@accpoints,@functions);
+		}
+		if ($hasoth) {
+			push(@others,$close);
+			push(@accpoints,@others);
+		}
+	}
+
+
+	$eadacc= join ("\n", @accpoints);
+	$eadacc =~ s/<\/controlaccess>\n{2,}/<\/controlaccess>\n/g;
+	return $eadacc;
+},
+
+
+
+
+
+
+##=================================================##
+## Build Adrian's DSC                              ##
+##=================================================##
+
+
+'make_adrian_dsc' =>
+
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	my $template = $cfg->{Template}->{"Template $var_name"};
+	$template =~ s/\{\$([A-Z0-9_]+)\}/$post_data->{$1}/g;
+	my ($component_template_string, $component_template_name);
+	$template =~ /(\{\$([A-Z0-9_]+)\*\})/ && ($component_template_string = $1, $component_template_name = $2);
+	my $node = $post_tree->{$component_template_name};
+	my $dsc_string;
+	while ($node) {
+		my $component_template = $cfg->{Template}->{"Template $component_template_name"};
+		my ($subcomponent_template_string, $subcomponent_template_name, $alt_string, $alt_text);
+		$component_template =~ /(\{\$([A-Z0-9_]+)\*(\|([^\n\r\{\}]*))?})/ && ($subcomponent_template_string = $1, $subcomponent_template_name = $2, $alt_string = $3, $alt_text = $4);
+		$new_string = $component_template_string;
+		$new_string =~ s/\{\$/[\$/;
+		$new_string =~ s/\*\}/*]/;
+		$component_template =~ s/\Q$subcomponent_template_string\E/$new_string/;
+		my $fields = $node->{fields};
+		if ($fields->{UNITTITLE}) {
+			$component_template = &ProcessTemplate ($cfg, $component_template, $post_data, $post_tree, $fields);
+			my $subnode = $node->{sub};
+			my $subcomponent_string;
+			while ($subnode) {
+				my $subfields = $subnode->{fields};
+				my $subcomponent_template = $cfg->{Template}->{"Template $subcomponent_template_name"};
+				if ($subfields->{UNITTITLE}) {
+					$subcomponent_template = &ProcessTemplate ($cfg, $subcomponent_template, $post_data, $post_tree, $subfields);
+					$subcomponent_string .= $subcomponent_template;
+					
+				}
+				$subnode = $subnode->{next};
+			}
+			if ($subcomponent_string) {
+				$component_template =~ s/\Q$new_string\E/$subcomponent_string/;
+			} elsif ($alt_string) {
+				$component_template =~ s/\Q$new_string\E/$alt_text/;
+			} else {
+				$component_template =~ s/\Q$new_string\E//;
+			}
+			$dsc_string .= $component_template;
+		}
+		$node = $node->{next};
+	}
+	
+	#$dsc_string =~ s/\{\$[^\{\}\n]+\}//g;
+	$dsc_string = &CleanTemplate ($dsc_string);
+	$dsc_string =~ s/\n<head>[^<>]*<\/head>\n*(<\/[^<>]+>)/$1/g;
+	$dsc_string =~ s/<([a-z0-9]+)[^<>]*>\s*<\/\1>\n*//g;
+	$dsc_string =~ s/<([a-z0-9]+)[^<>]*>\s*<\/\1>\n*//g;
+	$dsc_string =~ s/<([a-z0-9]+)[^<>]*>\s*<\/\1>\n*//g;
+	$dsc_string =~ s/<\/c02>\s*<\/c01>/<\/c02>\n<\/c01>/g;
+	$dsc_string =~ s/\s*(<!--[^<>]+-->)\s*/\n\n$1\n\n/g;
+	$template =~ s/\Q$component_template_string\E/$dsc_string/;
+	$template =~ s/<\/c01>\s*<\/dsc>\s*/<\/c01>\n<\/dsc>/;
+	$template =~ s/\n*$//;
+	return $template;
+
+
+},
+
+
+
+
+
+
+##=================================================##
+## Delete all tag pairs with no content            ##
+##=================================================##
+
+
+'delete_empties' =>
+
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	unless ($text) {
+		if ($node_fields) {
+			$text = $node_fields->{$var_name};
+		} else {
+			$text = $post_data->{$var_name};
+		}
+	}
+	$text =~ s/<([a-z0-9]+)[^<>]*>\s*<\/\1>\n?//g;
+	$text =~ s/<([a-z0-9]+)[^<>]*>\s*<\/\1>\n?//g;
+	$text =~ s/<([a-z0-9]+)[^<>]*>\s*<\/\1>\n?//g;
+	$text =~ s/<([a-z0-9]+)[^<>]*>\s*<\/\1>\n?//g;
+	return $text;
+},
+
+
+##=================================================##
+## Formatted chronlists                            ##
+##=================================================##
+
+'formatted_chronlist' =>
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	unless ($text) {
+		if ($node_fields) {
+			$text = $node_fields->{$var_name};
+		} else {
+			$text = $post_data->{$var_name};
+		}
+	}
+	$text =~ s/\r//g;
+	return unless $text;
+	my @lines = split (/\n/, $text);
+	my (@events, $content_flag, $date_event_flag, $event_flag, $chrontext, $chron_p);
+	foreach my $line (@lines) {
+		my $event = {};
+		if ($line =~ /^\s*$/) {
+			if ($content_flag) {
+				unless ($events[$#events]->{type} eq 'blank_line') {
+					$event->{type} = 'blank_line';
+					push @events, $event;
+				}
+			}
+		} else {
+			$content_flag = 1;
+			if ($line =~ /^(.{4,20})( {3,}|\t+)([^\s\r\n]+.*)$/) {
+				$event->{type}  = 'date_event';
+				$event->{date}  = $1;
+				$event->{event} = $3;
+				$date_event_flag = 1;
+				$event_flag = 1;
+				push @events, $event;
+			} elsif ($line =~ /^[ \t]*([^\s\r\n\t]+.*)$/) {
+				my $line_text = $1;
+				if ($date_event_flag) {
+					if ($events[$#events]->{type} eq 'blank_line') {
+						if ($events[$#events - 1]) {
+							if ($events[$#events - 1]->{type} eq 'date_event') {
+								push @{$events[$#events - 1]->{eventgrp}}, $line_text;
+							}
+						}
+					} elsif ($events[$#events]->{eventgrp}) {
+						if ($line_text =~ /^[A-Z]/) {
+							push @{$events[$#events]->{eventgrp}}, $line_text;
+						} else {
+							$events[$#events]->{eventgrp}->[-1] .= " $line_text";
+						}
+					} elsif ($events[$#events]->{type} eq 'date_event') {
+						if ($line_text =~ /^[A-Z]/) {
+							push @{$events[$#events]->{eventgrp}}, $line_text;
+						} else {
+							$events[$#events]->{event} .= " $line_text";
+						}
+					}
+				} else {
+					if ($event_flag) {
+						if ($events[$#events]->{type} eq 'blank_line') {
+							$event->{type} = 'p';
+							$event->{data} = $line_text;
+							push @events, $event;
+						} elsif ($events[$#events]->{type} eq 'p') {
+							$events[$#events]->{data} .= " $line_text";
+							push @events, $event;
+						}
+					} else {
+						$event->{type} = 'p';
+						$event->{data} = $line_text;
+						push @events, $event;
+					}
+					$event_flag = 1;
+				}
+			}
+		}
+	}
+	foreach my $event (@events) {
+		if ($event->{eventgrp}) {
+			my $templ = $cfg->{Template}->{'Template DateEventgrp'};
+			$templ =~ s/\{DATE\}/$event->{date}/;
+			$templ =~ s/\{EVENT\}/$event->{event}/;
+			my $eventgrps;
+			foreach my $eventgrp (@{$event->{eventgrp}}) {
+				my $temp = $cfg->{Template}->{'Template Eventgrp'};
+				$temp =~ s/\{EVENTGRP\}/$eventgrp/;
+				$eventgrps .= "$temp";
+			}
+			$templ =~ s/\{EVENTGRPS\}/$eventgrps/;
+			$chrontext .= $templ;
+		} elsif ($event->{date}) {
+			my $templ = $cfg->{Template}->{'Template DateEvent'};
+			$templ =~ s/\{EVENT\}/$event->{event}/;
+			$templ =~ s/\{DATE\}/$event->{date}/;
+			$chrontext .= $templ;
+		} elsif ($event->{type} eq 'p') {
+			my $templ = $cfg->{Template}->{'Template ChronBiogP'};
+			$templ =~ s/\{CONTENT\}/$event->{data}/;
+			$chron_p .= $templ;
+		}
+	}
+	my $chronlist = $cfg->{Template}->{'Template Chronlist'};
+	$chronlist =~ s/\{CHRONITEMS\}/$chrontext/;
+	my $biogchron = "$chron_p$chronlist";
+	$biogchron =~ s/\n+$//g;
+	return $biogchron;
+},
+
+
+
+##=================================================##
+## Proofing string                                 ##
+##=================================================##
+
+
+'proof' =>
+
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	my $proof_string;
+	foreach my $key (sort keys %{$post_data}) {
+		$proof_string .= "$key=\"";
+		$proof_string .= $post_data->{$key},
+		$proof_string .= "\"\n";
+	}
+	return $proof_string;
+},
+
+
+'current_date' =>
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	my $month     = (January,February,March,April,May,June,July,August,September,October,November,December)[(localtime)[4]];
+	my $mday      = (localtime)[3];
+	my $year      = (localtime)[5] + 1900;
+	my $datetime  = "$month $mday, $year";
+	return $datetime;
+},
+
+
+'normal_current_date' =>
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	my $month       = sprintf ("%02d", (localtime)[4] + 1);
+	my $mday        = sprintf ("%02d", (localtime)[3]);
+	my $year        = (localtime)[5] + 1900;
+	my $normal_date = "$year$month$mday";
+	return $normal_date;
+},
+
+
+
+'langusage_languages' =>
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	my $node = $post_tree->{$var_name};
+	my $intro_text = $post_data->{"${var_name}_TEXT"};
+	my $languages;
+	while ($node) {
+		my $fields = $node->{fields};
+		my $code = $fields->{CODE};
+		my $script = $fields->{SCRIPT};
+		my $lang = $fields->{LANGUAGE};
+		$languages .= "<language langcode=\"$code\" scriptcode=\"$script\">$lang</language>\n" if $lang;
+		$node = $node->{next};
+	}
+	my $langusage;
+	if ($languages) {
+		$langusage = "<langusage>$intro_text\n$languages</langusage>";
+	}
+	return $langusage if $languages;
+},
+
+
+'langmaterial' =>
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	my $node = $post_tree->{$var_name};
+	my $intro_text = $post_data->{"${var_name}_TEXT"};
+	my $languages;
+	while ($node) {
+		my $fields = $node->{fields};
+		my $code = $fields->{CODE};
+		my $lang = $fields->{LANG};
+		$languages .= "<language langcode=\"$code\">$lang</language>\n" if $lang;
+		$node = $node->{next};
+	}
+	my $langmaterial;
+	if ($languages) {
+		$langmaterial = "$intro_text\n$languages";
+	}
+	return $langmaterial if $languages;
+},
+
+
+'descrules' =>
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	my $node = $post_tree->{$var_name};
+	my $rules;
+	my $intro_text = $post_data->{"${var_name}_TEXT"};
+	while ($node) {
+		my $fields = $node->{fields};
+		my $rule = $fields->{RULE};
+		$rules .= "<title render=\"italic\">$rule</title>\n" if $rule;
+		$node = $node->{next};
+	}
+	my $descrules;
+	if ($rules) {
+		$descrules = "\n<descrules>$intro_text\n$rules</descrules>";
+	}
+	return $descrules if $rules;
+},
+
+
+##=================================================##
+## "Structured" chronlists                         ##
+##=================================================##
+
+'structured_chronlist' =>
+
+sub {
+	my ($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields) = @_;
+	my $node = $post_tree->{$var_name};
+	my @chronitems;
+	while ($node) {
+		my $date  = $node->{fields}->{DATE};
+		my $event = $node->{fields}->{EVENT};
+		my $chronitem = {};
+		if ($date) {
+			$chronitem->{date} = $date;
+			push @{$chronitem->{events}}, $event if $event;
+			push @chronitems, $chronitem;
+		} elsif ($event) {
+			push @{$chronitems[-1]->{events}}, $event if $chronitems[-1];
+		}
+		$node = $node->{next};
+	}
+	my $chronlist_text;
+	foreach my $chronitem (@chronitems) {
+		my $date = $chronitem->{date};
+		my @events = @{$chronitem->{events}};
+		my $chronitem_template;
+		if ($#events) {
+			$chronitem_template = $cfg->{Template}->{'Template DateEventgrp'};
+			$chronitem_template =~ s/\{DATE\}/$date/;
+			my $first_event = shift @events;
+			$chronitem_template =~ s/\{EVENT\}/$first_event/;
+			my $eventgrp;
+			foreach my $event (@events) {
+				my $event_template = $cfg->{Template}->{'Template Eventgrp'};
+				$event_template =~ s/\{EVENTGRP\}/$event/;
+				$eventgrp .= $event_template;
+			}
+			$chronitem_template =~ s/\{EVENTGRPS\}/$eventgrp/;
+		} else {
+			$chronitem_template = $cfg->{Template}->{'Template DateEvent'};
+			my $event = $events[0];
+			$chronitem_template =~ s/\{DATE\}/$date/;
+			$chronitem_template =~ s/\{EVENT\}/$event/;
+		}
+		$chronlist_text .= $chronitem_template;
+	}
+	chomp ($chronlist_text);
+	return $chronlist_text;
+},
+
+);
+
+
+1;

@@ -1,0 +1,403 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- BEGIN METADATA -->
+<title>Inside CDL: OAC EAD Web Templates</title>
+<meta name="description" content="" />
+<!-- END METADATA -->
+<!--#include virtual="/includes/insidecdl-styles.html" -->
+<style type="text/css">
+/*<![CDATA[*/
+li.c2 {list-style: none}
+span.c1 {font-size: 80%}
+/*]]>*/
+</style>
+</head>
+<body>
+<div class="box-wrap">
+<div class="header"><!--#include virtual="/includes/insidecdl-header.html" --></div>
+<div class="columns-float">
+<div class="column-one"><div class="column-one-content">
+<!--#include virtual="/includes/insidecdl-left.html" -->
+<!--#include virtual="/includes/insidecdl-left-oac.html" -->
+
+
+<!-- SEE ALSO --></div></div>
+<div class="column-two">
+<div class="column-two-content"><!--#exec cmd="perl /cdldir/scripts/breadcrumb.pl"-->
+<div class="doc-body"><!-- BEGIN DOCUMENT BODY -->
+          <h1>OAC EAD Web Templates</h1>          
+          <h3>EAD Version 2002</h3>
+          <h2>Template Usage</h2>
+
+
+          <ul>
+            <li>These online forms were developed by the OAC for generating collection- 
+              through item-level finding aids that are compliant 
+              with the OAC BPG EAD and EAD Version 2002. Encoders cut and paste 
+              segments of their non-EAD finding aids into the form, or enter collection data directly into the form. The form is 
+              then converted to a text file and saved as a XML EAD file. EAD files 
+
+              should be validated and checked for OAC BPG EAD-compliance using 
+              a XML parser, in addition to voroEAD and/or the OAC BPG Validator. 
+              <p>The template cgi program used to generate the encoding, including 
+                several sample templates, is available for <a href="/inside/projects/oac/toolkit/templates/template.zip">downloading</a>. 
+                Please note that there is currently is no documentation, however, 
+                on implementing template syntax or using the cgi program to create 
+                your own template.</p>
+            </li>
+            <li>Templates are available to all OAC contributing members. Request 
+              a template using the <a href="/inside/projects/oac/toolkit/templates/NewMemberForm.doc">OAC 
+              EAD Web Template Request Form</a>. Institutions should note the 
+              following template features and options: 
+              <ul>
+                <li>Internet Explorer or Netscape 6.0 is required for use of the 
+                  templates.</li>
+                <li>Templates produce XML markup only.</li>
+                <li>Templates contain some basic customizations (such as repository-specific 
+                  contact information, and default access and publication rights 
+                  statements). </li>
+                <li>Contact the OAC if you would like edit default information 
+                  or heading values in template fields. Note also that EAD elements 
+                  with LABEL attributes in &lt;archdesc&gt;&lt;did&gt; also have 
+                  default values -- these may also be edited by contacting the 
+                  OAC. </li>
+              </ul>
+            </li>
+            <li>Please read the <a href="/inside/projects/oac/toolkit/templates/help1-2.html">OAC 
+              EAD Web Templates Guide</a> before completing your first template.</li>
+            <li>For information on the scope, functionality, and use of the OAC 
+              EAD Web Templates as an encoding strategy, see <a href="/inside/projects/oac/ead/local3_ead.html">Doing 
+              EAD Locally: Encoding Strategies and Tools</a>.</li>
+          </ul>
+
+
+      <h2>Templates</h2><blockquote> 
+            <blockquote>
+              <h3>Art Center College of Design Archives</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/clart">General 
+                  template</a></li>
+              </ul>			
+			  <h3>California Historical Society</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/chist">General 
+                  template</a></li>
+              </ul>
+              <h3>California Institute of Technology</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/caltech">General 
+                  template</a></li>
+              </ul>
+              <h3>California Polytechnic State University, San Luis Obispo</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cslusp">General 
+                  template</a></li>
+              </ul>			  
+              <h3>California State Archives</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/csa">General 
+                  template</a></li>
+              </ul>
+              <h3>California State Library</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/csl">General 
+                  template</a></li>
+              </ul>
+              <h3>California State Parks</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cspr">General 
+                  template</a></li>
+              </ul>
+              <h3>California State Railroad Museum Library</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cscrm">General 
+                  template</a></li>
+              </ul>
+              <h3>California State University, Chico</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cchis">General 
+				template</a></li>
+              </ul>
+              <h3>California State University, Fresno</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cvpa">Central Valley 
+				 Political Archive template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/csuf">Sanoian 
+                  Special Collections Library template</a></li>
+              </ul>
+              <h3>California State University, San Francisco</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/larc">Labor 
+                  Archives &amp; Research template</a></li>
+              </ul>
+              <h3>Chabot Space and Science Center Archives</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/coch">General 
+				template</a></li>
+              </ul>			  
+              <h3>Chapman University</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/corc">Leatherby Libraries 
+				template</a></li>
+              </ul>
+              <h3>Claremont Colleges</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/claremont-den">Ella 
+                  Strong Dennison Library template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/claremont-mud">Honnold/Mudd 
+                  Library template</a></li>
+              </ul>
+              <h3>Computer History Museum</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/camvchm">General
+				template</a></li>
+              </ul>
+              <h3>Dorothy Peyton Gray Transportation Library</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/calamta">General 
+				template</a></li>
+              </ul>
+	              <h3>Focus on the Masters, Archives and Libary</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cavtfom">General 
+                  template</a></li>
+              </ul>
+              <h3>Gay, Lesbian, Bisexual, Transgender Historical Society</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/glbths">General 
+                  template</a></li>
+              </ul>
+              <h3>Graduate Theological Union Archives</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cbgtu">General 
+                  template</a></li>
+              </ul>
+              <h3>History San Jose, Research Library</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/casjhsj">General 
+                  template</a></li>
+              </ul>
+              <h3>Holocaust Center of Northern California</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/csfhcn">General 
+                  template</a></li>
+              </ul>			  
+			  <h3>Humboldt State University Library</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/carcht">General 
+                  template</a></li>
+              </ul>
+              <h3>Huntington Library, Manuscripts Department</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/csmh_m">General 
+                  template</a></li>
+              </ul>		
+              <h3>Huntington Library, Photograph Collections</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/csmh">General 
+                  template</a></li>
+              </ul>		
+              <h3>Japanese American Historical Society of San Diego</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/casdjah">General 
+                  template</a></li>
+              </ul>
+              <h3>Japanese American National Museum</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cljanm">General 
+                  template</a></li>
+              </ul>
+              <h3>Local History Digital Resources Project (LHDRP) </h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/lhdr">Virtual collection EAD 
+                  template</a></li>
+              </ul>
+              <h3>Loyola Marymount University Library</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/clloy">General 
+                  template</a></li>
+              </ul>
+              <h3>National Park Service, Golden Gate National Recreation Area, Park Archives and Records Center</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/casfggn">General 
+                  template</a></li>
+              </ul>
+              <h3>Occidental College Library</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/clo">General 
+                  template</a></li>
+              </ul>
+              <h3>ONE National Gay and Lesbian Archives</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/calaong">General 
+                  template</a></li>
+              </ul>
+              <h3>Redwood National Park</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/caccnps">General 
+                  template</a></li>
+              </ul>
+              </ul>
+              <h3>Sacramento Archives and Museum Collection Center</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/samcc">General 
+                  template</a></li>
+              </ul>
+              <h3>San Diego Historical Society</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/sdhists">General 
+                  template</a></li>
+              </ul>
+              <h3>San Francisco Public Library</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/sfpl">General 
+                  template</a></li>
+              </ul>
+              <h3>San Jose State University Library</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/csju">General 
+                  template</a></li>
+              </ul>
+              <h3>Santa Barbara Botanic Garden, Blaksley Library</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cstbbg">General 
+                  template</a></li>
+              </ul>
+              <h3>Santa Barbara Museum of Natural History</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cstbm">General 
+                  template</a></li>
+              </ul>			  
+              <h3>Santa Clara County Archives</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/casjsca">General 
+                  template</a></li>
+              </ul>			  
+			  <h3>Santa Clara University</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/stclara">General 
+                  template</a></li>
+              </ul>
+              <h3>Society of California Pioneers</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/csfcp">General 
+                  template</a></li>
+              </ul>
+              <h3>Stanford University</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cst-mus">Archive 
+                  of Recorded Sound template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/hoover">Hoover 
+                  Institution Archives template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cst-muslib">Music
+				  Library template</a></li>				  
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cst-rbd">Rare 
+                  Book Division template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cst-mss">Special 
+                  Collections template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cst-uarc">University 
+                  Archives template</a></li>
+              </ul>
+              <h3>UC Berkeley</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ceda">Environmental 
+                  Design Archives template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/hedtl">Harmer E. Davis 
+				Transportation Library template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cuwr">Water Resources Center Archives
+				template</a></li>
+              </ul>
+              <h3>UC Irvine</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/uci-seaa">Southeast 
+                  Asian Archives template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/uci-spcoll">Special 
+                  Collections and Archives template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/uci-uarc">University 
+                  Archives template</a></li>
+              </ul>
+              <h3>UC Los Angeles</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucla-arts">Arts 
+                  Library Special Collections template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucla-biomed">Louise 
+                  M. Darling Biomedical Library template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucla-spcoll">Manuscripts 
+                  Division template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucla-music">Music 
+                  Library Special Collections template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucla-uarc">University 
+                  Archives template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucla-clark">William 
+                  Andrews Clark Memorial Library template</a></li>
+              </ul>
+              <h3>UC Riverside</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucr-spcoll">Special 
+                  Collections template</a></li>
+              </ul>
+              <h3>UC San Francisco</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucsf-spcoll">Special 
+                  Collections template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucsf-tca">Tobacco 
+                  Control Archives template</a></li>
+              </ul>
+              <h3>UC Santa Barbara</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucsb">Special 
+                Collections template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cusb-cema">California Ethnic and Multicultural Archives template</a></li>
+              </ul>  
+              <h3>UC Santa Cruz</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucsc">Special 
+                  Collections and Archives template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/ucsc-uarc">University 
+                  Archives template</a></li>
+              </ul>
+              <h3>University of Southern California</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/usc-rhc">Regional 
+                  History Center template</a></li>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/usc-spcoll">Special 
+                  Collections template</a></li>
+              </ul>
+              <h3>University of the Pacific</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cstoc">Holt-Atherton Department of Special Collections 
+				template</a></li>
+              </ul>
+              <h3>Western Jewish History Center</h3>
+              <ul>
+                <li><a href="http://www.cdlib.org/cgi-bin/oactools/template/oacead/cbm">General template</a>
+			  </ul>
+            </blockquote>
+            <!-- END DOCUMENT BODY -->
+        </blockquote>
+
+
+</div>
+        <div class="metadata"> 
+<!-- BEGIN METADATA2 -->
+<p><em>Document owner:</em> <strong>CDL Digital Special Collections (oacops @ cdlib . org) </strong></p>
+<p><em>Last reviewed:</em> March 2008</p>
+<!-- END METADATA2 -->
+	<p><em>URL:</em> http://<!--#echo var="HTTP_HOST" var="DOCUMENT_URI" --><br /><br /></p>
+	</div>
+	</div>
+<!-- BEGIN CONTACT THE CDL -->
+<div class="contact-box"><span class="contact-box-header">CDL Digital Special Collections Helpdesk</span>
+  <ul>
+    <li><em>Need assistance? Contact us via e-mail: </em><strong>oacops @ cdlib . org</strong></li>
+  </ul>
+</div>
+<!-- END CONTACT THE CDL -->
+	</div>
+	</div>
+	<div class="footer"><!--#include virtual="/includes/insidecdl-copyright.html" --></div>
+	</div>
+	</body>
+	</html>

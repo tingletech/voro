@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- BEGIN METADATA -->
+<title>Inside CDL: OAC EAD Web Template Request Form</title>
+<meta name="description" content="" /><!-- END METADATA -->
+<!--#include virtual="/includes/insidecdl-styles.html" -->
+<style type="text/css">
+/*<![CDATA[*/
+li.c2 {list-style: none}
+span.c1 {font-size: 80%}
+/*]]>*/
+</style>
+</head>
+<body>
+<div class="box-wrap">
+<div class="header"><!--#include virtual="/includes/insidecdl-header.html" --></div>
+<div class="columns-float">
+<div class="column-one"><div class="column-one-content">
+<!--#include virtual="/includes/insidecdl-left.html" -->
+<!--#include virtual="/includes/insidecdl-left-oac.html" -->
+
+<!-- SEE ALSO --></div></div>
+<div class="column-two">
+<div class="column-two-content"><!--#exec cmd="perl /cdldir/scripts/breadcrumb.pl"-->
+<div class="doc-body"><!-- BEGIN DOCUMENT BODY -->
+          <h1>OAC EAD Web Template Request Form</h1>
+
+          <p>OAC collaborating institutions need to provide the following pieces 
+            of information in order for the OAC to build a new template. Please 
+            review the <a href="/inside/projects/oac/toolkit/templates/index.html">OAC 
+            EAD Web Templates </a> Webpage before completing this form:</p>
+
+<strong>* Denotes required field.</strong>
+
+<form name="form1" action="/cgi-bin/oac_newmemform.cgi" method="post"> 
+<input type="hidden" name="subject" value="OAC EAD Web Template Request Form" />
+<input type="hidden" name="redirect" value="/inside/projects/oac/toolkit/templates/newmemform_thanks.html" />
+<input type="hidden" name="env_report" value="REMOTE_HOST,REMOTE_ADDR,REMOTE_USER,HTTP_USER_AGENT,HTTP_REFERER" />
+
+<h2>1. CONTACT INFORMATION:</h2>
+
+            <p>A contact information statement is <i>optional </i>on the title 
+              pages of all OAC finding aids. This should consist of the repository 
+              name, its address, phone and fax number, email address, and URL 
+              for the repository's home page. Please note that the email address 
+              can be an individual's email address, a departmental or reference 
+              email address, or an email account created specifically to support 
+              queries originating from users of the online finding aid database.</p>
+<p>
+<b>Example:</b></p>
+<p>
+<u>Contact Information</u>:
+<br />Department of Special Collections
+<br />Green Library
+<br />Stanford University Libraries
+<br />Stanford, California, 94305-6004
+<br />Phone: (650) 725-1022
+<br />Fax: (650) 723-8690
+<br />Email: speccoll@sulmail.stanford.edu
+<br />URL: http://www-sul.stanford.edu/depts/spc/</p>
+<h4>PLEASE FILL IN:</h4>
+<table border="0">
+<tr>
+                <td class="nolines" align="right"> Organization</td>
+<td class="nolines">
+<input type="text" size="50" name="aaOrganization_Name"></td></tr>
+<tr>
+<td class="nolines" align="right">&#160;</td>
+<td class="nolines">
+<input type="text" size="50" name="abOrganization_Subname"></td></tr>
+<tr>
+                <td class="nolines" align="right"> Street address</td>
+<td class="nolines">
+<input type="text" size="50" name="acStreet_Address"></td></tr>
+<tr>
+<td class="nolines" align="right">
+Address (cont.) </td>
+<td class="nolines">
+<input type="text" size="50" name="adAddress_Contd"></td></tr>
+<tr>
+                <td class="nolines" align="right"> City</td>
+<td class="nolines">
+<input type="text" size="50" name="aeCity"></td></tr>
+<tr>
+                <td class="nolines" align="right"> State/Province</td>
+<td class="nolines">
+<input type="text" size="50" name="afState"></td></tr>
+<tr>
+                <td class="nolines" align="right"> Zip/Postal code</td>
+<td class="nolines">
+<input type="text" size="50" name="agZip_Code"></td></tr>
+<tr>
+                <td class="nolines" align="right"> Phone</td>
+<td class="nolines">
+<input type="text" size="50" name="ahPhone"></td></tr>
+<tr>
+<td class="nolines" align="right">
+FAX </td>
+<td class="nolines">
+<input type="text" size="50" name="aiFax"></td></tr>
+<tr>
+                <td class="nolines" align="right"> E-mail</td>
+<td class="nolines">
+<input type="text" size="50" name="ajEmail"></td></tr>
+<tr>
+<td class="nolines" align="right">
+URL </td>
+<td class="nolines">
+<input type="text" size="50" name="akURL"></td></tr></table>
+
+            <h2>&nbsp;</h2>
+
+            <h2>2. CATALOG ENTRY FORM OF REPOSITORY:</h2>
+
+<p>This is the AACR2 form of the repository's corporate name. The 
+<a href="http://authorities.loc.gov/">Library of Congress Name Authority File</a> should be consulted first. If an entry for the name is not found, consult your local authority file. If the name has never been established in any authority file, one should be created following AACR2 Chapter 24. The OAC can compose the corporate name for any repository unable to do so for themselves.</p>
+<p>
+<b>Examples:</b>
+<br /></p>
+<ul>
+<li>Bancroft Library
+<br /></li>
+<li>Henry Madden Library (California State University, Fresno). Sanoian Special Collections Library
+<br /></li>
+<li>California State University, Northridge. Libraries. Special Collections</li></ul>
+
+<br />
+<h4>PLEASE FILL IN: *</h4>
+<p>
+<textarea name="amCorporate_Name" rows="5" cols="50"></textarea></p>
+            <h2>3. "OFFICIAL" NAME AND ADDRESS OF REPOSITORY:</h2>
+
+<p>This is the name of the repository as you would like it to appear on the title page and elsewhere in your finding aid.</p>
+<p>
+<b>Examples:</b></p>
+<ul>
+<li>Hoover Institution Archives
+<br />Stanford University
+<br />Stanford, California
+<br />
+<br /></li>
+<li>The Bancroft Library
+<br />University of California, Berkeley
+<br />Berkeley, California
+<br />
+<br /></li>
+<li>University Library
+<br />California State University, Northridge</li></ul>
+
+<br />
+<h4>PLEASE FILL IN: *</h4>
+<p>
+<textarea name="anOfficial_Name" rows="7" cols="50"></textarea></p>
+            <h2>4. DEFAULT ACCESS STATEMENT:</h2>
+
+<p>Please provide a default access statement for your repository collections. Repositories may choose to use the same access statement for all collections or they may choose to create an access statement on a case-by-case basis.</p>
+<p>
+<b>Examples:</b></p>
+<ul>
+<li>
+<u>Access</u>
+<br />Collection is open for research.
+<br />
+<br /></li>
+<li>
+<u>Access Restrictions</u>
+<br />None.</li></ul>
+
+<br />
+<h4>PLEASE FILL IN: *</h4>
+<p>
+<textarea name="aoAccess" rows="6" cols="50"></textarea></p>
+            <h2>5. PUBLICATION RIGHTS STATEMENT:</h2>
+
+<p>As with the access statement, a repository may choose to supply a publication rights statement on a case-by-case basis or choose a blanket publication rights statement for all collections.</p>
+<p>
+<b>Examples:</b></p>
+<ul>
+<li>
+<u>Publication Rights</u>
+<br />The library can only claim physical ownership of the collection. Users are responsible for satisfying any claimants of literary property.
+<br />
+<br /></li>
+<li>
+<u>Publication Rights</u>
+<br />Copyright has not been assigned to the Special Collections Library, UC Riverside. All requests for permission to publish or quote from manuscripts must be submitted in writing to the Head of Special Collections. Permission for publication is given on behalf of the Special Collections Library as the owner of the physical items and is not intended to include or imply permission of the copyright holder, which must also be obtained by the reader.</li></ul>
+
+<br />
+<h4>PLEASE FILL IN: *</h4>
+<textarea name="apPublication_Rights" rows="7" cols="50"></textarea>
+            <h2>6. COPYRIGHT STATEMENT:</h2>
+
+<p>
+<b>Examples:</b></p>
+<ul>
+<li>&#169; 2005 The Regents of the University of California. All rights reserved.
+<br /></li>
+<li>&#169; 2005 California State Library. All rights reserved.</li></ul>
+<br />
+<h4>PLEASE FILL IN: *</h4>
+<p>
+<textarea name="aqCopyright" rows="7" cols="50" align="left">&#169; 2004</textarea></p>
+            <h2>7. FORM OF PREFERRED CITATION:</h2>
+
+<p>The default format that the repository prefers for the citation of its collections.</p>
+<p>
+<u>Preferred Citation</u>
+<br />Arbor Vitae Club Collection, Courtesy of the Archives at the Pasadena Historical Museum.</p>
+<p>Please note that contributing members may change the wording of this statement to suit their own institution.</p>
+<h4>PLEASE FILL IN: *</h4>
+<textarea name="arPreferred_Citation" rows="7" cols="50"></textarea>
+            <h2>8. SHELF LOCATION NOTE:</h2>
+<p>Is there a default shelf location note you would like included on your finding aids? You may omit the shelf location note or include one on a case-by-case basis.</p>
+<p>Please note that a shelf location note is required for University of California collections housed at regional storage facilities (NRLF and SRLF).</p>
+<p>
+<b>Example:</b>
+<br />
+<br />
+<u>Shelf location</u>
+<br />For current information on the location of these materials, please consult the Library's online catalog.</p>
+<h4>PLEASE FILL IN:</h4>
+<textarea name="atShelf_Location" rows="6" cols="50"></textarea>
+            <h2>9. YOUR NAME/EMAIL:</h2>
+<p>Used if we have questions regarding your form submission.</p>
+            <table border="0">
+              <tr>
+<td class="nolines" align="right">
+Your Name* </td>
+<td class="nolines">
+<input type="text" size="50" name="realname"></td></tr>
+<tr>
+<td class="nolines" align="right">
+Your Email* </td>
+<td class="nolines">
+<input type="text" size="50" name="avMy_Email"></td></tr></table>
+            <h2>10. COMMENTS:</h2>
+            <p>Please enter any additional comments or requests.</p>
+<p>
+<textarea name="ayComments" rows="7" cols="50"></textarea></p>
+<p><input type="reset" value="Reset Form"> 
+<input type="submit" value="Submit Form"></p>
+</form>
+<hr>
+
+<!-- END DOCUMENT BODY -->
+<br />
+<br />
+</div>
+        <div class="metadata">
+          <!-- BEGIN METADATA2 -->
+          <p><em>Document Owner:</em> <a href="http://www.cdlib.org/inside/projects/oac/help/help_affiliates.html">OAC 
+            Operations Group</a></p>
+          <p><em>Last reviewed:</em> October 13, 2004</p>
+<!-- END METADATA2 -->
+<p><em>URL:</em> http://<!--#echo var="HTTP_HOST" var="DOCUMENT_URI" --></p>
+</div>
+</div>
+
+<!-- BEGIN RELATED INFORMATION -->
+<div class="related-info-box">
+<a name="related_info"></a>
+<span class="related-info-box-header">Related Information</span>
+        <ul>
+          <li><a href="/inside/projects/oac/toolkit/templates/index.html">OAC EAD Web 
+            Templates </a></li>
+        </ul>
+      </div>
+    </div>
+</div>
+<div class="footer"><!--#include virtual="/includes/insidecdl-copyright-oac.html" --></div>
+</div>
+</body>
+</html>

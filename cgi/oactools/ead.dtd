@@ -1,0 +1,1458 @@
+#!/usr/local/bin/perl
+
+print <<'EOF';
+Content-type: text/xml
+
+<!ENTITY % m.render             'emph | lb'                       >
+
+<!ENTITY % m.ptrs               'ptr | extptr'                    >
+
+<!ENTITY % m.refs               'ref | extref | linkgrp |
+                                 bibref | title | archref'        >
+
+<!ENTITY % m.access             'corpname | famname | geogname |
+                                 name | occupation | persname |
+                                 subject | genreform | function'  >
+
+<!ENTITY % m.data               '%m.access; | date | num |
+                                 origination | repository |
+                                 unitdate | unittitle'            >
+
+<!ENTITY % m.phrase.bare        '%m.ptrs; | %m.render;'           >
+
+
+<!ENTITY % m.phrase.basic.norefs
+                                '%m.phrase.bare; | abbr | expan'  >
+
+<!ENTITY % m.phrase.basic       '%m.phrase.basic.norefs; |
+                                 %m.refs;'                        >
+
+<!ENTITY % m.phrase.plus.norefs '%m.phrase.basic.norefs; |
+                                 %m.data;'                        >
+
+
+<!ENTITY % m.phrase.plus        '%m.phrase.basic.norefs; |
+                                 %m.data; | %m.refs;'             >
+
+
+<!ENTITY % m.inter.noquote      'address | chronlist | list |
+                                 note | table'                    >
+
+<!ENTITY % m.inter              '%m.inter.noquote; | blockquote'  >
+
+
+<!ENTITY % m.blocks             '%m.inter; | p'                   >
+
+<!ENTITY % m.blocks.noquote     '%m.inter.noquote; | p'           >
+
+<!ENTITY % m.did                'abstract | physdesc | note |
+                                 repository | origination |
+                                 unitdate | unitid | unittitle |
+                                 container | physloc |
+                                 dao | daogrp'                    >
+
+
+<!ENTITY % m.desc.base          'admininfo | bioghist |
+                                 controlaccess | odd |
+                                 scopecontent | organization |
+                                 arrangement | add'               >
+
+
+<!ENTITY % m.desc.full          '%m.desc.base; | dsc |
+                                 dao | daogrp | note'             >
+
+
+<!ENTITY % m.admininfo          'accessrestrict | acqinfo |
+                                 altformavail | appraisal |
+                                 custodhist | prefercite |
+                                 processinfo | userestrict |
+                                 accruals'                        >
+
+
+<!ENTITY % m.dentry             '%m.did; | %m.desc.base;'         >
+
+
+<!ENTITY % m.para.content       '%m.phrase.plus; | %m.inter;'     >
+
+
+<!ENTITY % m.para.content.norefs
+                                '%m.phrase.plus.norefs; |
+                                 %m.inter;'                       >
+<!ENTITY % m.table.entry        '%m.phrase.plus; | address |
+                                 list | note'                     >
+
+
+<!ENTITY % cm.head.n.para       '(head?, (%m.blocks;)*)'          >
+
+
+<!ENTITY % av.level             'series | collection | file |
+                                 fonds | item | otherlevel |
+                                 recordgrp |  subgrp | subseries' >
+
+<!ENTITY % av.render            'bold | italic | bolditalic |
+                                 boldunderline | boldsmcaps |
+                                 boldquoted | nonproport |
+                                 altrender | quoted | smcaps |
+                                 sub | super | underline'         >
+
+
+<!ENTITY % av.sources           'aat | aacr2 | cdwa | dot |
+                                 gmgpc | lcnaf | lcsh | lctgm |
+                                 local | mesh | mim | ncarules |
+                                 nmc | rad | rbgenr | tgn | ulan |
+                                 othersource'                     >
+
+<!ENTITY % av.container         'carton | box | folder | reel |
+                                 frame | oversize | reel-frame |
+                                 volume | map-case | box-folder |
+                                 page | folio | othertype'        >
+
+
+<!ENTITY % a.common
+         'id                ID                       #IMPLIED
+          altrender         CDATA                    #IMPLIED
+          audience          (external | internal)    #IMPLIED'    >
+
+
+<!ENTITY % a.access
+         'source             (%av.sources;)          #IMPLIED
+          othersource        CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED
+          authfilenumber     CDATA                   #IMPLIED
+          normal             CDATA                   #IMPLIED'    >
+
+
+<!ENTITY % a.desc.base
+         'otherlevel         CDATA                      #IMPLIED
+          langmaterial       CDATA                      #IMPLIED
+          legalstatus        (public | private |
+                              otherlegalstatus)         #IMPLIED
+          otherlegalstatus   CDATA                      #IMPLIED' >
+
+
+<!ENTITY % a.desc.all
+         'level              (%av.level;)               #REQUIRED
+          %a.desc.base;'                                          >
+
+<!ENTITY % a.component
+         'level              (%av.level;)               #IMPLIED
+          %a.desc.base;'                                          >
+
+
+<!ENTITY % simple
+         ''    >
+
+<!ENTITY % extended
+         ''  >
+
+<!ENTITY % locator
+         ''   >
+
+<!ENTITY % locator.att
+         'href                CDATA                  #IMPLIED'    >
+
+<!ENTITY % link-semantics.att
+         'inline              (true|false)           "true"
+          role                CDATA                  #IMPLIED'    >
+
+<!ENTITY % simple-link-semantics.att
+         'inline              (true|false)           "true"'      >
+
+<!ENTITY % remote-resource-semantics.att
+         'role                CDATA                  #IMPLIED
+          title               CDATA                  #IMPLIED
+          show                (embed|replace|new)    #IMPLIED
+          actuate             (auto|user)            #IMPLIED
+          behavior            CDATA                  #IMPLIED'    >
+
+<!ENTITY % local-resource-semantics.att
+         'content-role        CDATA                  #IMPLIED
+          content-title       CDATA                  #IMPLIED'    >
+
+
+<!ENTITY % a.internal.ptr
+         'target              IDREF                  #IMPLIED
+          xpointer            CDATA                  #IMPLIED
+          %simple;
+          %locator.att;
+          %remote-resource-semantics.att;
+          %local-resource-semantics.att;
+          %simple-link-semantics.att;'                            >
+
+
+
+<!ENTITY % a.external.ptr
+         'entityref           ENTITY                 #IMPLIED
+          xpointer            CDATA                  #IMPLIED
+          %simple;
+          %locator.att;
+          %remote-resource-semantics.att;
+          %local-resource-semantics.att;
+          %simple-link-semantics.att;'                            >
+
+
+<!ENTITY % a.linkgrp
+         '%extended;
+          %link-semantics.att;
+          %local-resource-semantics.att;'                         >
+
+<!ENTITY % a.loc.internal.ptr
+         'target              IDREF                  #IMPLIED
+          xpointer            CDATA                  #IMPLIED
+          %locator;
+          %locator.att;
+          %remote-resource-semantics.att;'                        >
+
+<!ENTITY % a.loc.external.ptr
+         'entityref           ENTITY                 #IMPLIED
+          xpointer            CDATA                  #IMPLIED
+          %locator;
+          %locator.att;
+          %remote-resource-semantics.att;'                        >
+
+
+<!ELEMENT ead                (eadheader, frontmatter?, archdesc)  >
+
+<!ATTLIST ead
+          %a.common;
+          relatedencoding     CDATA                  #IMPLIED     >
+
+
+<!ELEMENT eadheader          (eadid, filedesc, profiledesc?,
+                              revisiondesc?)                      >
+<!ATTLIST eadheader
+          %a.common;
+          langencoding       CDATA                   #IMPLIED
+          relatedencoding    CDATA                   #IMPLIED
+          findaidstatus      (unverified-partial-draft |
+                             unverified-full-draft |
+                             edited-partial-draft |
+                             edited-full-draft)      #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT eadid              (#PCDATA)                            >
+
+<!ATTLIST eadid
+          systemid           CDATA                   #IMPLIED
+          source             CDATA                   #IMPLIED
+          type               CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT filedesc           (titlestmt, editionstmt?,
+                              publicationstmt?, seriesstmt?,
+                              notestmt?)                          >
+
+<!ATTLIST filedesc
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT titlestmt          (titleproper+, subtitle*, author?,
+                              sponsor?)                           >
+
+<!ATTLIST titlestmt
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT titleproper        (#PCDATA | %m.phrase.bare; | abbr |
+                              date | expan | num)*                >
+
+<!ATTLIST titleproper
+          %a.common;
+          extent             (all | part |
+                              unknown-extent)        #IMPLIED
+          pubstatus          (pub | unpub |
+                              unknown-pub)           #IMPLIED
+          render             (%av.render;)           #IMPLIED
+          type               CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT subtitle           (#PCDATA | %m.phrase.bare; | abbr |
+                              date | expan | num)*                >
+
+<!ATTLIST subtitle
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT author             (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST author
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT sponsor            (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST sponsor
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT editionstmt        (edition | p)+                       >
+
+<!ATTLIST editionstmt
+          %a.common;
+          encodinganalog      CDATA                  #IMPLIED     >
+
+
+
+<!ELEMENT publicationstmt
+                              (publisher | date | address | num
+                                  | p)+                           >
+
+<!ATTLIST publicationstmt
+          %a.common;
+          encodinganalog     CDATA                  #IMPLIED      >
+
+
+
+<!ELEMENT seriesstmt         (titleproper | num | p)+             >
+
+<!ATTLIST seriesstmt
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT notestmt           (note)+                              >
+
+<!ATTLIST notestmt
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT profiledesc        (creation?, langusage?)              >
+
+<!ATTLIST profiledesc
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT creation           (#PCDATA | %m.phrase.basic; | date)* >
+
+<!ATTLIST creation
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT langusage          (#PCDATA | %m.phrase.basic; |
+                              language)*                          >
+
+<!ATTLIST langusage
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT language           (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST language
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT revisiondesc       (list | change+)                     >
+
+<!ATTLIST revisiondesc
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT change             (date, item+)                        >
+
+<!ATTLIST change
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT frontmatter         (titlepage?, div*)                  >
+
+<!ATTLIST frontmatter
+          %a.common;                                              >
+
+
+<!ELEMENT titlepage           (%m.blocks; | author | date |
+                                edition | num | publisher |
+                                bibseries | sponsor |
+                                titleproper | subtitle)*          >
+
+<!ATTLIST titlepage
+          %a.common;                                              >
+
+
+
+<!ELEMENT div                 (head?, (%m.blocks;)*, div*)        >
+
+<!ATTLIST div
+          %a.common;                                              >
+
+
+
+<!ELEMENT archdesc           (runner*, did, (%m.desc.full;)*)     >
+
+<!ATTLIST archdesc
+          %a.common;
+          type               (inventory | register |
+                              othertype)             #IMPLIED
+          othertype          CDATA                   #IMPLIED
+          %a.desc.all;
+          encodinganalog     CDATA                   #IMPLIED
+          relatedencoding    CDATA                   #IMPLIED     >
+
+
+<!ELEMENT runner              (#PCDATA | %m.phrase.bare;)*        >
+
+<!ATTLIST runner
+          %a.common;
+          placement           (header | footer |
+                               watermark)            #IMPLIED
+          role                CDATA                  #IMPLIED     >
+
+
+
+<!ELEMENT did                (head?, (%m.did;)*)                  >
+
+<!ATTLIST did
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT physdesc           (#PCDATA | %m.phrase.basic; |
+                              dimensions | physfacet | extent |
+                              date | %m.access;)*                 >
+
+<!ATTLIST physdesc
+          %a.common;
+          source             (%av.sources;)          #IMPLIED
+          othersource        CDATA                   #IMPLIED
+          label              CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT dimensions         (#PCDATA | %m.phrase.basic; |
+                              dimensions)*                        >
+
+<!ATTLIST dimensions
+          %a.common;
+          type               CDATA                   #IMPLIED
+          unit               CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT physfacet          (#PCDATA | %m.phrase.basic; |
+                              %m.access; | date)*                 >
+
+<!ATTLIST physfacet
+          %a.common;
+          type               CDATA                   #IMPLIED
+          unit               CDATA                   #IMPLIED
+          source             (%av.sources;)          #IMPLIED
+          othersource        CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT extent             (#PCDATA | %m.phrase.basic;)*        >
+
+<!ATTLIST extent
+          %a.common;
+          type               CDATA                   #IMPLIED
+          unit               CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT origination        (#PCDATA | %m.phrase.basic;|
+                              corpname | famname | name |
+                              persname)*                          >
+
+<!ATTLIST origination
+          %a.common;
+          label              CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT repository         (#PCDATA | %m.phrase.basic; |
+                              address | corpname | name |
+                              subarea)*                           >
+
+<!ATTLIST repository
+          %a.common;
+          label              CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT subarea            (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST subarea
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT unitdate           (#PCDATA | %m.phrase.basic;)*        >
+
+<!ATTLIST unitdate
+          %a.common;
+          label              CDATA                   #IMPLIED
+          type               (bulk | inclusive |
+                              single)                #IMPLIED
+          certainty          CDATA                   #IMPLIED
+          normal             CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT unitid             (#PCDATA | %m.phrase.basic;)*        >
+
+<!ATTLIST unitid
+          %a.common;
+          label              CDATA                   #IMPLIED
+          type               CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED
+          countrycode        CDATA                   #IMPLIED
+          repositorycode     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT container          (#PCDATA | %m.phrase.basic;)*        >
+
+<!ATTLIST container
+          %a.common;
+          label              CDATA                   #IMPLIED
+          type               (%av.container;)        #IMPLIED
+          othertype          CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED
+          parent             IDREFS                  #IMPLIED     >
+
+
+<!ELEMENT physloc            (#PCDATA | %m.phrase.basic;)*        >
+
+<!ATTLIST physloc
+          %a.common;
+          label              CDATA                   #IMPLIED
+          type               CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED
+          parent             IDREFS                  #IMPLIED     >
+
+
+
+<!ELEMENT unittitle          (#PCDATA | %m.phrase.basic; |
+                              %m.access; | unitdate | num | date)*>
+
+<!ATTLIST unittitle
+          %a.common;
+          label              CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED
+          type               CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT abstract           (#PCDATA | %m.phrase.basic;)*        >
+
+<!ATTLIST abstract
+          %a.common;
+          label           CDATA                        #IMPLIED
+          encodinganalog  CDATA                        #IMPLIED
+          type            CDATA                        #IMPLIED   >
+
+
+
+<!ELEMENT admininfo          (head?, (%m.blocks; |
+                              %m.admininfo; | admininfo)+)        >
+<!ATTLIST admininfo
+          %a.common;
+          type               CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT accruals           %cm.head.n.para;                     >
+
+<!ATTLIST accruals
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT accessrestrict     %cm.head.n.para;                     >
+
+<!ATTLIST accessrestrict
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT acqinfo            %cm.head.n.para;                     >
+
+<!ATTLIST acqinfo
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT altformavail       %cm.head.n.para;                     >
+
+<!ATTLIST altformavail
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED
+          type               CDATA                   #IMPLIED     >
+
+
+<!ELEMENT appraisal          %cm.head.n.para;                     >
+
+<!ATTLIST appraisal
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT custodhist         (head?, (%m.blocks; | acqinfo)*)     >
+
+<!ATTLIST custodhist
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT prefercite         %cm.head.n.para;                     >
+
+<!ATTLIST prefercite
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT processinfo        %cm.head.n.para;                     >
+
+<!ATTLIST processinfo
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT userestrict        %cm.head.n.para;                     >
+
+<!ATTLIST userestrict
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT bioghist           (head?, (%m.blocks; | bioghist |
+                              dao | daogrp)+)                     >
+
+<!ATTLIST bioghist
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+
+<!ELEMENT controlaccess      (head?, (%m.blocks;| %m.access; |
+                              title | controlaccess)+)            >
+
+<!ATTLIST controlaccess
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT odd                (head?, (%m.blocks; | dao |
+                              daogrp | odd)*)                     >
+
+<!ATTLIST odd
+          %a.common;
+          type               CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT scopecontent       (head?, (%m.blocks; |
+                              arrangement | organization |
+                              scopecontent | dao | daogrp)+)      >
+
+<!ATTLIST scopecontent
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT arrangement        (head?, (%m.blocks; | arrangement)*) >
+
+<!ATTLIST arrangement
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT organization       (head?, (%m.blocks; | organization)*)>
+
+<!ATTLIST organization
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT dsc                ((head?, tspec?, (%m.blocks;)*),
+                              ((thead?, (c* | c01*))* | dsc*))    >
+
+<!ATTLIST dsc
+          %a.common;
+          type               (analyticover |
+                              combined |
+                              in-depth |
+                              othertype)             #REQUIRED
+          othertype          CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT tspec              (colspec+, spanspec*)                >
+
+
+
+<!ELEMENT c                  ((head?, did, (%m.desc.full;)*,
+                              (thead?, c+)*) | (drow+, c*))       >
+
+<!ATTLIST c
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT drow               (dentry+)                            >
+
+<!ATTLIST drow
+          %a.common;
+          rowsep             CDATA                   #IMPLIED
+          valign             (top|middle|bottom)     #IMPLIED     >
+
+
+<!ELEMENT dentry             (%m.dentry;)*                        >
+
+<!ATTLIST dentry
+          %a.common;
+          colname            NMTOKEN                 #IMPLIED
+          namest             NMTOKEN                 #IMPLIED
+          nameend            NMTOKEN                 #IMPLIED
+          spanname           NMTOKEN                 #IMPLIED
+          morerows           CDATA                   "0"
+          colsep             CDATA                   #IMPLIED
+          rowsep             CDATA                   #IMPLIED
+          rotate             CDATA                   "0"
+          valign            (top|middle|bottom)      #IMPLIED
+          align             (left|right|center|
+                             justify|char)           #IMPLIED
+          charoff           CDATA                    #IMPLIED
+          char              CDATA                    #IMPLIED     >
+
+
+<!ELEMENT c01                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c02+)*) | (drow+, c02*))   >
+
+<!ATTLIST c01
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT c02                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c03+)*) | (drow+, c03*))   >
+
+<!ATTLIST c02
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT c03                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c04+)*) | (drow+, c04*))   >
+<!ATTLIST c03
+          %a.common;
+          %a.component;
+          encodinganalog CDATA           #IMPLIED                 >
+
+
+<!ELEMENT c04                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c05+)*) | (drow+, c05*))   >
+<!ATTLIST c04
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT c05                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c06+)*) | (drow+, c06*))   >
+<!ATTLIST c05
+          %a.common;
+          %a.component;
+          encodinganalog CDATA                       #IMPLIED     >
+
+
+<!ELEMENT c06                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c07+)*) | (drow+, c07*))   >
+<!ATTLIST c06
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT c07                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c08+)*) | (drow+, c08*))   >
+<!ATTLIST c07
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT c08                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c09+)*) | (drow+, c09*))   >
+<!ATTLIST c08
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT c09                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c10+)*) | (drow+, c10*))   >
+<!ATTLIST c09
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT c10                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c11+)*) | (drow+, c11*))   >
+<!ATTLIST c10
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT c11                ((head?, did, (%m.desc.full;)*,
+                              (thead?, c12+)*) | (drow+, c12*))   >
+<!ATTLIST c11
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT c12                ((head?, did, (%m.desc.full;)*) |
+                              (drow+))                            >
+<!ATTLIST c12
+          %a.common;
+          %a.component;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+<!ELEMENT add                (head?, (%m.blocks; | bibliography |
+                              fileplan | index | relatedmaterial |
+                              separatedmaterial | add |
+                              otherfindaid)*)                     >
+
+<!ATTLIST add
+          %a.common;
+          type               CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT bibliography       (head?, (%m.blocks; | %m.refs; |
+                              bibliography)*)                     >
+
+<!ATTLIST bibliography
+          %a.common;
+          numbered           (yes | no)              #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT fileplan           (head?, (%m.blocks; | fileplan)*)    >
+
+<!ATTLIST fileplan
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT relatedmaterial    (head?, (%m.blocks; | %m.refs; |
+                              relatedmaterial)*)                  >
+
+<!ATTLIST relatedmaterial
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT separatedmaterial  (head?, (%m.blocks; |%m.refs; |
+                              separatedmaterial)*)                >
+
+<!ATTLIST separatedmaterial
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT otherfindaid       (head?, (%m.blocks; | %m.refs; |
+                              otherfindaid)*)                     >
+
+<!ATTLIST otherfindaid
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT index              (head?,(%m.blocks;)*,
+                              ((((listhead)?), indexentry+) |
+                              index*))                            >
+
+<!ATTLIST index
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT indexentry         ((namegrp | %m.access;),
+                              (ptrgrp | ptr | ref)?, indexentry*) >
+
+<!ATTLIST indexentry
+          %a.common;                                              >
+
+
+<!ELEMENT namegrp            (%m.access; | note)+                 >
+
+<!ATTLIST namegrp
+          %a.common;                                              >
+
+
+<!ELEMENT ptrgrp             (ptr | ref)+                         >
+
+<!ATTLIST ptrgrp
+          %a.common;                                              >
+
+
+
+<!ELEMENT head               (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST head
+          %a.common;
+          althead            CDATA                   #IMPLIED     >
+
+<!ELEMENT p                  (#PCDATA | %m.para.content;)*        >
+
+<!ATTLIST p
+          %a.common;                                              >
+
+
+
+<!ELEMENT emph               (#PCDATA | %m.phrase.basic;)*        >
+
+<!ATTLIST emph
+          render             (%av.render;)           #IMPLIED
+          id                 ID                      #IMPLIED
+          altrender          CDATA                   #IMPLIED     >
+
+
+<!ELEMENT lb                 EMPTY                                >
+
+
+<!ELEMENT dao                (daodesc?)                           >
+
+<!ATTLIST dao
+          %a.common;
+          %a.external.ptr;                                        >
+
+
+<!ELEMENT daoloc             (daodesc?)                           >
+
+<!ATTLIST daoloc
+          %a.common;
+          %a.loc.external.ptr;                                    >
+
+
+<!ELEMENT daodesc            %cm.head.n.para;                     >
+
+<!ATTLIST daodesc
+          %a.common;                                              >
+
+
+<!ELEMENT daogrp             (daodesc?, (daoloc | ptrloc |
+                              extptrloc | refloc | extrefloc)*)   >
+
+
+<!ATTLIST daogrp
+          %a.common;
+          %a.linkgrp;                                             >
+
+<!ELEMENT ptr                EMPTY                                >
+
+<!ATTLIST ptr
+          %a.common;
+          %a.internal.ptr;                                        >
+
+
+<!ELEMENT ptrloc             EMPTY                                >
+
+<!ATTLIST ptrloc
+          %a.common;
+          %a.loc.internal.ptr;                                    >
+
+
+<!ELEMENT extptr             EMPTY                                >
+
+<!ATTLIST extptr
+          %a.common;
+          %a.external.ptr;                                        >
+
+
+<!ELEMENT extptrloc          EMPTY                                >
+
+<!ATTLIST extptrloc
+          %a.common;
+          %a.loc.external.ptr;                                    >
+
+
+
+<!ELEMENT ref                (#PCDATA | %m.para.content.norefs; |
+                              bibref | title | extref | archref)* >
+
+<!ATTLIST ref
+          %a.common;
+          %a.internal.ptr;                                        >
+
+
+<!ELEMENT refloc              (#PCDATA | %m.para.content.norefs; |
+                               bibref | title | extref |
+                               archref)*                          >
+
+<!ATTLIST refloc
+          %a.common;
+          %a.loc.internal.ptr;                                    >
+
+<!ELEMENT extref             (#PCDATA | %m.para.content.norefs; |
+                              bibref | ref | title | archref)*    >
+
+<!ATTLIST extref
+          %a.common;
+          %a.external.ptr;                                        >
+
+<!ELEMENT extrefloc          (#PCDATA | %m.para.content.norefs; |
+                              bibref | ref | title | archref)*    >
+
+<!ATTLIST extrefloc
+          %a.common;
+          %a.loc.external.ptr;                                    >
+
+
+
+<!ELEMENT linkgrp            (ptrloc | extptrloc | refloc |
+                              extrefloc)*                         >
+
+<!ATTLIST linkgrp
+          %a.common;
+          %a.linkgrp;                                             >
+
+<!ELEMENT title              (#PCDATA | %m.phrase.bare; | date |
+                              num)*                               >
+
+<!ATTLIST title
+          %a.common;
+          %a.access;
+          %a.external.ptr;
+          render             (%av.render;)           #IMPLIED
+          extent             (all | part |
+                              unknown-extent)        #IMPLIED
+          pubstatus          (pub | unpub |
+                              unknown-pub)           #IMPLIED     >
+
+<!ELEMENT archref            (#PCDATA | %m.phrase.basic.norefs; |
+                              bibref | ref | title | extref |
+                              %m.did;)*                           >
+
+<!ATTLIST archref
+          %a.common;
+          %a.external.ptr;                                        >
+
+
+
+<!ELEMENT bibref             (#PCDATA | %m.phrase.basic.norefs; |
+                              edition | imprint | name | num |
+                              bibseries | ref | title |
+                              famname | persname | corpname |
+                              extref | archref)*                  >
+
+<!ATTLIST bibref
+          %a.common;
+          %a.external.ptr;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT edition            (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST edition
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+
+<!ELEMENT bibseries          (#PCDATA | %m.phrase.bare; | title |
+                              num)*                               >
+
+<!ATTLIST bibseries
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT imprint            (#PCDATA | %m.phrase.bare; |
+                              publisher | geogname | date)*       >
+
+<!ATTLIST imprint
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT publisher          (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST publisher
+          %a.common;
+          encodinganalog     CDATA                    #IMPLIED    >
+
+
+
+<!ELEMENT corpname           (#PCDATA | %m.phrase.bare; |
+                              subarea)*                           >
+
+<!ATTLIST corpname
+          %a.common;
+          %a.access;
+          role               CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT famname            (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST famname
+          %a.common;
+          %a.access;
+          role               CDATA                   #IMPLIED     >
+
+
+<!ELEMENT geogname           (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST geogname
+          %a.common;
+          %a.access;
+          role               CDATA                    #IMPLIED    >
+
+
+<!ELEMENT genreform          (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST genreform
+          %a.common;
+          %a.access;                                              >
+
+
+<!ELEMENT name               (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST name
+          %a.common;
+          %a.access;
+          role               CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT occupation         (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST occupation
+          %a.common;
+          %a.access;                                              >
+
+
+
+<!ELEMENT function           (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST function
+          %a.common;
+          %a.access;                                              >
+
+
+<!ELEMENT persname           (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST persname
+          %a.common;
+          %a.access;
+          role               CDATA                   #IMPLIED     >
+
+<!ELEMENT subject            (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST subject
+          %a.common;
+          %a.access;                                              >
+
+
+<!ELEMENT date               (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST date
+          %a.common;
+          type               CDATA                   #IMPLIED
+          normal             CDATA                   #IMPLIED
+          certainty          CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT num                (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST num
+          %a.common;
+          type               CDATA                   #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT abbr               (#PCDATA)                            >
+
+<!ATTLIST abbr
+          %a.common;
+          expan              CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT expan              (#PCDATA)                            >
+
+<!ATTLIST expan
+          %a.common;
+          abbr               CDATA                   #IMPLIED     >
+
+
+<!ELEMENT address            (addressline+)                       >
+
+<!ATTLIST address
+          %a.common;                                              >
+
+
+<!ELEMENT addressline        (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST addressline
+          %a.common;                                              >
+
+
+<!ELEMENT chronlist          (head?, (listhead)?, (chronitem)+)   >
+
+<!ATTLIST chronlist
+          %a.common;
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+<!ELEMENT chronitem          (date, (event | eventgrp))           >
+
+<!ATTLIST chronitem
+          %a.common;                                              >
+
+
+
+<!ELEMENT event              (#PCDATA | %m.para.content;)*        >
+
+<!ATTLIST event
+          %a.common;                                              >
+
+
+
+<!ELEMENT eventgrp           (event+)                             >
+
+<!ATTLIST eventgrp
+          %a.common;                                              >
+
+
+
+<!ELEMENT list               (head?, (item+ | (listhead?,
+                              defitem+)))                         >
+
+<!ATTLIST list
+          %a.common;
+          type               (simple | deflist |
+                              marked | ordered)      #IMPLIED
+          mark               CDATA                   #IMPLIED
+          numeration         (arabic |
+                              upperalpha |
+                              loweralpha |
+                              upperroman |
+                              lowerroman)            #IMPLIED
+          continuation       (continues | starts)    #IMPLIED     >
+
+
+
+<!ELEMENT listhead           (head01?, head02?)                   >
+
+<!ATTLIST listhead
+          %a.common;                                              >
+
+
+
+<!ELEMENT head01             (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST head01
+          %a.common;                                              >
+
+
+
+<!ELEMENT head02             (#PCDATA | %m.phrase.bare;)*         >
+
+<!ATTLIST head02
+          %a.common;                                              >
+
+
+
+<!ELEMENT item               (#PCDATA | %m.para.content;)*        >
+
+<!ATTLIST item
+          %a.common;                                              >
+
+
+<!ELEMENT label              (#PCDATA | %m.phrase.plus;)*         >
+
+<!ATTLIST label
+          %a.common;                                              >
+
+
+<!ELEMENT defitem            (label, item)                        >
+
+<!ATTLIST defitem
+          %a.common;                                              >
+
+<!ELEMENT blockquote         (%m.blocks.noquote;)*                >
+
+<!ATTLIST blockquote
+          %a.common;                                              >
+
+
+<!ELEMENT note               (%m.blocks;)*                        >
+
+<!ATTLIST note
+          %a.common;
+          label              CDATA                   #IMPLIED
+          show               (embed|new)             #IMPLIED
+          actuate            (auto|user)             #IMPLIED
+          encodinganalog     CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT table              (head?,tgroup+)                      >
+
+<!ATTLIST table
+          %a.common;
+          tabstyle           NMTOKEN                 #IMPLIED
+          tocentry           CDATA                   "1"
+          shortentry         CDATA                   #IMPLIED
+          frame              (top | bottom |
+                              topbot | all |
+                              sides | none)          #IMPLIED
+          colsep             CDATA                   #IMPLIED
+          rowsep             CDATA                   #IMPLIED
+          orient             (port|land)             #IMPLIED
+          pgwide             CDATA                   #IMPLIED     >
+
+
+<!ELEMENT tgroup             (colspec*, spanspec*, thead?,
+                              tfoot?, tbody)                      >
+
+<!ATTLIST tgroup
+          %a.common;
+          cols               CDATA                   #REQUIRED
+          tgroupstyle        NMTOKEN                 #IMPLIED
+          colsep             CDATA                   #IMPLIED
+          rowsep             CDATA                   #IMPLIED
+          align              (left | right |
+                              center | justify |
+                              char)                  "left"
+          charoff            CDATA                   "50"
+          char               CDATA                   ""           >
+
+
+<!ELEMENT colspec            EMPTY                                >
+
+<!ATTLIST colspec
+          colnum             CDATA                   #IMPLIED
+          colname            NMTOKEN                 #IMPLIED
+          align              (left | right |
+                              center | justify |
+                              char)                  #IMPLIED
+          charoff            CDATA                   #IMPLIED
+          char               CDATA                   #IMPLIED
+          colwidth           CDATA                   #IMPLIED
+          colsep             CDATA                   #IMPLIED
+          rowsep             CDATA                   #IMPLIED     >
+
+
+<!ELEMENT spanspec           EMPTY                                >
+
+<!ATTLIST spanspec
+          namest             NMTOKEN                 #REQUIRED
+          nameend            NMTOKEN                 #REQUIRED
+          spanname           NMTOKEN                 #REQUIRED
+          align              (left | right |
+                              center | justify |
+                              char)                  #IMPLIED
+          charoff            CDATA                   #IMPLIED
+          char               CDATA                   #IMPLIED
+          colsep             CDATA                   #IMPLIED
+          rowsep             CDATA                   #IMPLIED     >
+
+
+<!ELEMENT thead              (row+)                               >
+
+<!ATTLIST thead
+          %a.common;
+          valign             (top|middle|bottom)     "bottom"     >
+
+
+
+<!ELEMENT tfoot              (colspec*, row+)                     >
+
+<!ATTLIST tfoot
+          %a.common;
+          valign             (top | middle | bottom) "top"        >
+
+
+
+<!ELEMENT tbody              (row+)                               >
+<!ATTLIST tbody
+          %a.common;
+          valign             (top | middle | bottom) "top"        >
+
+
+
+<!ELEMENT row                (entry)+                             >
+
+<!ATTLIST row
+          %a.common;
+          valign             (top | middle | bottom) #IMPLIED
+          rowsep             CDATA                   #IMPLIED     >
+
+
+
+<!ELEMENT entry              (#PCDATA | %m.table.entry;)*         >
+
+<!ATTLIST entry
+          %a.common;
+          colname            NMTOKEN                 #IMPLIED
+          namest             NMTOKEN                 #IMPLIED
+          nameend            NMTOKEN                 #IMPLIED
+          spanname           NMTOKEN                 #IMPLIED
+          morerows           CDATA                   "0"
+          colsep             CDATA                   #IMPLIED
+          rowsep             CDATA                   #IMPLIED
+          rotate             CDATA                   "0"
+          valign             (top | middle | bottom) #IMPLIED
+          align              (left | right | center |
+                              justify | char)        #IMPLIED
+          charoff            CDATA                   #IMPLIED
+          char               CDATA                   #IMPLIED     >
+
+EOF
+

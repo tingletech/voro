@@ -1,0 +1,1551 @@
+[Global Template Variables]
+TEMPLATE_TITLE       Local History Digital Resources Project: Virtual Collection EAD Template, EAD Version 2002
+REPOSITORY_CODE      [Repository Code]	
+DEFAULT_ACCESS       Collection open for research.
+DEFAULT_PUBRIGHTS    
+DEFAULT_PHYSLOC      
+
+
+##===============================================##
+## Repository-specific subtemplates              ##
+##===============================================##
+
+[Template EADID]
+<eadid countrycode="us" mainagencycode="{REPOSITORY_CODE}"$[ identifier="{$ARK}"]$>{$FILENAME}</eadid>
+
+[Template PublicationStmt]
+<publicationstmt>
+<publisher>[Institution Name]</publisher>
+<address>
+<addressline>[Address Line]</addressline>
+<addressline>[Address Line]</addressline>
+<addressline>[City, State (abbrev.) Zip Code]</addressline>
+<addressline>[Phone]</addressline>
+<addressline>[Fax]</addressline>
+<addressline>[Email]</addressline>
+<addressline>[URL]</addressline>
+</address>
+<date>&#x00A9; 2008</date>
+<p>[Copyright]. All rights reserved.</p>
+</publicationstmt>
+
+[Template Publisher]
+<publisher>[Institution Name]
+<lb/>[Institution Sub-Name]
+<lb/>[City, State]</publisher>
+
+[Template Copyright]
+<p>&#x00A9; 2008 [Copyright]. All rights reserved.</p>
+
+[Template Repository]
+<repository label="Repository">
+<corpname>[Institution Corporate Name]
+<subarea>[Institution Sub-Name]</subarea></corpname>
+<address>
+<addressline>[City, State Zip Code]</addressline>
+</address>
+</repository>
+
+[Template PreferCite]
+<prefercite>
+<head>Preferred Citation</head>
+<p>{$APPM_TITLE}. $[{$CALL_NO}. ]$[Institution Name], [City, State].</p>
+</prefercite>
+
+##===============================================##
+## Markup templates                              ##
+##===============================================##
+
+[Template _DEFAULT]
+Content-type: text/plain
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ead PUBLIC "+//ISBN 1-931666-00-8//DTD ead.dtd (Encoded Archival Description (EAD) Version 2002)//EN" "ead.dtd">
+<ead>
+<eadheader langencoding="iso639-2b" scriptencoding="iso15924" repositoryencoding="iso15511" countryencoding="iso3166-1" dateencoding="iso8601">
+{@EADID}
+<filedesc>
+<titlestmt>
+<titleproper>{$PROPER_TITLE}</titleproper>
+<titleproper type="filing">{$FILETITLE}</titleproper>
+<author>{$PROCESSED_BY}</author>
+</titlestmt>
+{@PublicationStmt}
+</filedesc>
+<profiledesc>
+<creation>Machine-readable finding aid created by {$ENCODED_BY}.$[ Machine-readable finding aid derived from {$DERIVED_FROM}.]$ Date of source: <date$[ normal="{$NORMAL_CURRENT_DATE->normal_current_date}"]$>{$CURRENT_DATE->current_date}.</date></creation>
+<langusage>Finding aid written in: 
+<language langcode="eng" scriptcode="latn">English</language>
+</langusage>
+<descrules>Finding aid prepared using 
+<title render="italic">Describing Archives: a Content Standard</title>
+</descrules>
+</profiledesc>
+</eadheader>
+<frontmatter>
+<titlepage>
+<titleproper>{$FINDAID_TYPE}{$PROPER_TITLE}</titleproper>
+<num>Collection number: {$CALL_NO}</num>
+{@Publisher}
+{@ContactInfo}
+<list type="deflist">
+$[<defitem>
+<label>Processed by:</label>
+<item>{$PROCESSED_BY}</item>
+</defitem>]$
+$[<defitem>
+<label>Date Completed:</label>
+<item>{$DATE_COMPLETED}</item>
+</defitem>]$
+$[<defitem>
+<label>Encoded by:</label>
+<item>{$ENCODED_BY}</item>
+</defitem>]$
+</list>
+{@Copyright}
+</titlepage>
+</frontmatter>
+<archdesc level="collection">
+<did>
+<head>Descriptive Summary</head>
+<unittitle label="Title">{$APPM_TITLE}</unittitle>
+$[<unitdate type="single" normal="{$ISO8601_DATE1|}" label="Dates">{$APPM_DATE1}</unitdate>]$
+$[<unitdate type="bulk" normal="{$ISO8601_DATE2|}" label="Bulk Dates">{$APPM_DATE2}</unitdate>]$
+<unitid label="Collection number" repositorycode="{REPOSITORY_CODE}" countrycode="US">{$CALL_NO}</unitid>
+$[<origination label="{$ORIGINATION1_TYPE}">
+<{$ORIGINATION1_TAG} source="{$ORIGINATION1_SOURCE|}" rules="{$ORIGINATION1_RULES|}">{$ORIGINATION1}</{$ORIGINATION1_TAG}>
+</origination>]$
+$[<origination label="{$ORIGINATION2_TYPE}">
+<{$ORIGINATION2_TAG} source="{$ORIGINATION2_SOURCE|}" rules="{$ORIGINATION2_RULES|}">{$ORIGINATION2}</{$ORIGINATION2_TAG}>
+</origination>]$
+<physdesc label="Collection Size">
+<extent>{$EXTENT1}</extent>
+</physdesc>
+{@Repository}
+$[<abstract label="Abstract">{$ABSTRACT}</abstract>]$
+$[<physloc label="Physical location">{$PHYSLOC}</physloc>]$
+$[<langmaterial label="Languages">
+{$LANGMATERIAL->langmaterial}</langmaterial>]$
+</did>
+$[<accessrestrict>
+<head>{$ACCESSRESTRICT_HEAD|}</head>
+{$ACCESSRESTRICT->auto_p}
+</accessrestrict>]$
+$[<userestrict>
+<head>{$USERESTRICT_HEAD|}</head>
+{$USERESTRICT->auto_p}
+</userestrict>]$
+{@PreferCite}
+$[<acqinfo>
+<head>{$ACQUISITION_HEAD|}</head>
+{$ACQUISITION->auto_p}
+</acqinfo>]$
+$[<processinfo>
+<head>{$PROCESSINFO_HEAD|}</head>
+{$PROCESSINFO->auto_p}
+</processinfo>]$
+$[<bioghist>
+<head>{$BIOGPROSE_HEAD|}</head>
+{$BIOGPROSE->auto_p}
+</bioghist>]$
+$[<scopecontent>
+<head>{$SCOPECONTENT_HEAD|}</head>
+{$SCOPECONTENT->auto_p}
+</scopecontent>]$
+$[<controlaccess>
+<head>{$CONTROLACCESS_HEAD|}</head>
+<p>The following terms have been used to index the description of this collection in
+the library's online public access catalog.</p>
+{$CONTROLACCESS->controlaccess_manual}</controlaccess>]$
+</archdesc>
+</ead>
+
+##================================================##
+## Markup templates for OAC EAD/Web DSC           ##
+##================================================##
+
+[Template DSC]
+Content-type: text/plain
+
+<dsc type="{$DSC_TYPE}">
+<head>{$DSC_HEAD}</head>
+{$DSC_MARKUP->make_adrian_dsc}
+</dsc>
+
+[Template DSC_MARKUP]
+{$COMPONENT*}
+
+[Template COMPONENT]
+<c01 level="{$LEVEL}">
+<did>
+<unitid>{$UNITID}</unitid>
+<unittitle>{$UNITTITLE}</unittitle>
+$[<unitdate type="{$UNITDATE1_TYPE|}" normal="{$UNITDATE1_NORMAL|}">{$UNITDATE1}</unitdate>]$
+$[<unitdate type="{$UNITDATE2_TYPE|}" normal="{$UNITDATE2_NORMAL|}">{$UNITDATE2}</unitdate>]$
+<origination label="{$ORIGINATION1_LABEL|}">
+<{$ORIGINATION1_TAG} source="{$ORIGINATION1_SOURCE|}">{$ORIGINATION1}</{$ORIGINATION1_TAG}>
+</origination>
+<container type="{$CONTAINER_TYPE|}" label="{$CONTAINER_LABEL|}">{$CONTAINER}</container>
+<physdesc><extent>{$EXTENT}</extent></physdesc>
+</did>
+<scopecontent>
+<head>{$SCOPECONTENT_HEAD}</head>
+{$SCOPECONTENT->auto_p}
+</scopecontent>
+<accessrestrict>
+<head>{$ACCESSRESTRICT_HEAD}</head>
+{$ACCESSRESTRICT->auto_p}
+</accessrestrict>
+<userestrict>
+<head>{$USERESTRICT_HEAD}</head>
+{$USERESTRICT->auto_p}
+</userestrict>
+
+{$C02*|<!-- Insert container list here -->}
+
+</c01>
+
+[Template C02]
+<c02 level="{$LEVEL}">
+<did>
+<unitid>{$UNITID}</unitid>
+<unittitle>{$UNITTITLE}</unittitle>
+<unitdate type="{$UNITDATE1_TYPE|}" normal="{$UNITDATE1_NORMAL|}">{$UNITDATE1}</unitdate>
+<unitdate type="{$UNITDATE2_TYPE|}" normal="{$UNITDATE2_NORMAL|}">{$UNITDATE2}</unitdate>
+<origination label="{$ORIGINATION1_LABEL|}">
+<{$ORIGINATION1_TAG}>{$ORIGINATION1}</{$ORIGINATION1_TAG}>
+</origination>
+<container type="{$CONTAINER_TYPE|}" label="{$CONTAINER_LABEL|}">{$CONTAINER}</container>
+<physdesc><extent>{$EXTENT}</extent></physdesc>
+</did>
+<scopecontent>
+<head>{$SCOPECONTENT_HEAD}</head>
+{$SCOPECONTENT->auto_p}
+</scopecontent>
+<accessrestrict>
+<head>{$ACCESSRESTRICT_HEAD}</head>
+{$ACCESSRESTRICT->auto_p}
+</accessrestrict>
+<userestrict>
+<head>{$USERESTRICT_HEAD}</head>
+{$USERESTRICT->auto_p}
+</userestrict>
+
+<!-- Insert container list here -->
+
+</c02>
+
+[Global Template Variables]
+C01_COUNT        8
+C02_COUNT        4
+
+
+##================================================##
+## Content Frame                                  ##
+##================================================##
+
+[Form OACContent]
+Content-type: text/html
+
+{@OACTemplateHeader}
+{@OACPreliminary}
+{@OACDid}
+{@OACMainTextArea:name="ACCESSRESTRICT",head="Access",value="{DEFAULT_ACCESS}",link="Access"}
+{@OACMainTextArea:name="USERESTRICT",head="Publication Rights",value="{DEFAULT_PUBRIGHTS}",link="Userestrict"}
+{@OACMainTextArea:name="ACQUISITION",head="Acquisition Information",link="Acqinfo"}
+{@OACMainTextArea:name="BIOGPROSE",head="Biography / Administrative History",link="BiogProse"}
+{@OACMainTextArea:name="SCOPECONTENT",head="Scope and Content of Collection",link="ScopeContent"}
+{@OACControlAccess:name="CONTROLACCESS",count="20",link="ControlAccess"}
+{@OACMainTextArea:name="PROCESSINFO",head="Project Information",link="ProcessInfo"}
+{@OACTemplateFooter}
+
+
+##================================================##
+## TOC Frame                                      ##
+##================================================##
+
+[Form OACToc]
+Content-type: text/html
+
+{@OACTocHeader}
+{@OACTocRequired}
+{@OACLink:link="Access",text="Access Restrictions"}
+{@OACLink:link="Userestrict",text="Use Restrictions"}
+{@OACLink:link="Acqinfo",text="Acquisition Information"}
+{@OACLink:link="BiogProse",text="Biography / Administrative History"}
+{@OACLink:link="ScopeContent",text="Scope and Content of Collection"}
+{@OACLink:link="ControlAccess",text="Subjects"}
+{@OACLink:link="ProcessInfo",text="Project Information"}
+{@OACTocFooter}
+
+
+##================================================##
+## Main Content Preliminary Section               ##
+##================================================##
+
+[Form OACPreliminary]
+<hr>
+<UL>
+  <h3>General Data Entry Guidelines </h3>
+  <p>Copied text should be formatted into simple ASCII text prior to pasting into the template. The following kinds of characters and special formatting will not be rendered properly if directly cut-and-pasted into the template (consider globally replacing these characters in your source finding aid prior to cutting-and-pasting into the template):  </p>
+</UL>
+<UL>
+  <UL>
+  <LI><STRONG>Smart quotes (i.e., hooked quotes), super- and subscripts, and small fraction signs.</STRONG> Replace these characters with simple ASCII text.
+  <LI><STRONG>Special symbols, graphics, characters with diacritics, and non-Latin characters.</STRONG><BR>
+    <BR>
+    <UL>
+    <LI>Encode directly in UTF-8 Unicode or use Unicode decimal or hexadecimal character references (for hexadecimal character references, see <A href="http://www.unicode.org/charts/">Unicode</A> Website code charts). 
+    <LI>Note that all decimal character references should begin with an ampersand and pound sign, and end with a semicolon (use the syntax "&amp;#D;", where D is a decimal number). Note that all hexadecimal character references should begin with an ampersand, pound sign, and lower- or uppercase "x", and end with a semicolon (use the syntax "&amp;#xH;" or "&amp;#XH;", where H is a hexadecimal number).
+    <BLOCKQUOTE>
+      <p><EM>Example:</EM></p>
+      <p>... The papers are especially rich on trends in high school and university education among Russian &amp;#x00E9;migr&amp;#x00E9;s...</p>
+      <p>[<STRONG>NOTE:</STRONG> "&amp;#x00E9;" UTF-8 Unicode hexadecimal character reference used to encode the letter "&eacute;" in the word "&eacute;migr&eacute;s," derived from the Unicode Website's <A href="http://www.unicode.org/charts/PDF/U0080.pdf"><EM>Latin-1 Supplement</EM></A> code chart]</p>
+    </BLOCKQUOTE>
+  </li>
+    </UL>
+  <LI><STRONG>Ampersands and left and right angle brackets</STRONG>. These characters are reserved for markup delimiters when using XML, and need to be replaced with the following character entities:
+  <BLOCKQUOTE>
+    <p>Ampersand (&amp;) = &amp;amp;<BR>
+    Left angle bracket (&lt;) = &amp;lt;<BR>
+    Right angle bracket (&gt;) = &amp;gt;<BR>
+    </p>
+    <p><EM>Example:</EM></p>
+    <p>... the Contributing Members Benefits &amp;amp; Obligations Statement contains information for OAC affiliates...</p>
+    <p>[<STRONG>NOTE:</STRONG> "&amp;amp" character entity used to replace ampersand in "Contributing Members Benefits &amp; Obligations Statement]</p>
+  </BLOCKQUOTE>
+  </LI>
+  </UL>
+</UL>
+<hr>
+<blockquote>
+  <h3>Completing the Templates</h3>
+  <p>Click on the "Submit" button when you are finished to see the EAD files generated by the templates. Save the file according to the following procedures, based on the Web browser you are using: </p>
+  <blockquote>
+  <H4>Netscape:</H4>
+  <ul>
+  <li>These EAD file will appear in your browser window as HTML.</li>
+  <li>Select "File" and choose "Save Page As..." or "Save As ... " from your browser's toolbar.</li>
+  <li>In the "File name" window, assign the same file name to this file that you specified in the <STRONG>Filename</STRONG> field of the template. Include the ".xml" extension for all file names.<BR>
+    <blockquote>
+    <p><EM>Example:</EM><BR>
+    cmlpl.xml</p>
+    </blockquote>
+</li>
+  <li>In the "Save as type" window, select "Text file (*.txt)"</li>
+  <li>Select a location on your local workstation to save the file to, using the "Save in" function.</li>
+  <li>Save the file by hitting the "Save" button.</li>
+  <li>An ".html" or ".htm" extension may be appended to the file name you specified in <STRONG>Filename</STRONG>; this additional extension should be deleted (click on the file name, or use the "Rename" file function). <BR>
+</li>
+  </ul>
+  <H4>Microsoft Internet Explorer:</H4>
+  <ul>
+  <li>You will receive either an error message ("The XML page cannot be displayed") or a view of non-EAD encoded finding aid data.</li>
+  <li>Select "View" and choose "Source" from your browser's toolbar. The EAD file should be produced in the browser or in a separate application such as Notepad.</li>
+  <li>Select "File" and choose "Save As ... " from the toolbar of the application with the EAD file.</li>
+  <li>In the "File name" window, assign the same file name to this file that you specified in the <STRONG>Filename</STRONG> field of the template. Include the ".xml" extension.</li>
+  <li>In the "Save as type" window, select "Text file (*.txt)"</li>
+  <li>Select a location on your local workstation to save the file to, using the "Save in" function.</li>
+  <li>Save the file by hitting the "Save" button.</li>
+  <li>An ".html" or ".htm" extension may be appended to the file name you specified in <STRONG>Filename</STRONG>; this additional extension should be deleted (click on the file name, or use the "Rename" file function).</li>
+  </ul>
+  </blockquote>
+</blockquote>
+  <FORM name=eadform 
+action=http://www.cdlib.org/cgi-bin/oactools/template/oacead/uci-spcoll?submit=1 
+method=post target=blank>
+ <TABLE cellSpacing=0 cellPadding=10 border=1>
+    <TBODY>
+      <TR vAlign=top> 
+        <TD width="640" height="200"> 
+          <h2><font face="Arial, Helvetica, sans-serif"><strong>Preliminary Section</strong></font></h2>
+          <TABLE width="100%">
+            <TBODY>
+            
+
+            <!-- Processed by -->
+            
+              <TR vAlign=top> 
+                <TD width="150"><FONT face="Arial, Helvetica, sans-serif" size=-1>
+                  <b>Collection Processed By:</b></FONT>
+				   <p><font size="-1" face="Arial, Helvetica, sans-serif">
+				   <em>Enter the name of staff members who processed the collection </em>
+				   </font></p></TD>
+                <TD width="350"><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT size="40" name="PROCESSED_BY">
+                  </font></TD>
+              </TR>
+
+            <!-- Date completed -->
+            
+              <TR vAlign=top> 
+                <TD width="150"><FONT face="Arial, Helvetica, sans-serif" size=-1>
+                  <b>Template Completion Date:</b></FONT></TD>
+                <TD width="350"><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT size="40" name="DATE_COMPLETED" value="2007">
+                  </font></TD>
+              </TR>
+
+            <!-- Encoded by -->
+            
+              <TR vAlign=top> 
+                <TD width="150"><FONT face="Arial, Helvetica, sans-serif" size=-1>
+                  <b>Template Encoded By:</b></FONT>
+				  <p><font size="-1" face="Arial, Helvetica, sans-serif"><em>Enter the name of staff members who completed this template </em></font></p></TD>
+                <TD width="350"><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT size="40" name="ENCODED_BY">
+                  </font></TD>
+              </TR>
+
+            <!-- Filename -->
+
+              <TR vAlign=top> 
+                <TD width="150"><FONT face="Arial, Helvetica, sans-serif" size=-1>
+                  <b>Filename:</b></FONT>
+				  <p><font size="-1" face="Arial, Helvetica, sans-serif"><em>This is the filename for the EAD file that will be generated from the template. Enter your institution code, followed by &quot;.xml&quot;. For example:</em></font></p>
+            <p><font size="-1" face="Arial, Helvetica, sans-serif">cmlpl.xml</font></p></TD>
+                <TD width="350"><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT size="40" name="FILENAME">
+                  </font></TD>
+              </TR>
+           </TBODY>
+          </TABLE>
+        </TD>
+      </TR>
+    </TBODY>
+  </TABLE>
+
+
+##================================================##
+## Main Content <did> Section                     ##
+##================================================##
+
+[Form OACDid]
+  <TABLE cellSpacing=0 cellPadding=10 border=1>
+    <TBODY>
+      <TR vAlign=top> 
+        <TD> <h2><font face="Arial, Helvetica, sans-serif"><strong><a name="Did">Descriptive 
+            Summary</a></strong></font> </h2>
+          <TABLE>
+            <TBODY>
+		
+
+            <!-- Languages in the collection -->
+            
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1>
+                  <B>Language (Collection Materials)</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif">&nbsp; </font>
+                </TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD colspan="2"><blockquote>
+                  <INPUT name="LANGMATERIAL_TEXT" size="45" value="Languages represented in the collection: ">
+                  <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Code
+                  </B>&nbsp;</FONT>
+                  <INPUT name="LANGMATERIAL-00:CODE" size="5" value="eng">
+                  <FONT face="Arial, Helvetica, sans-serif" size=-1><B>Language
+                  </B>&nbsp;</FONT>
+                  <INPUT name="LANGMATERIAL-00:LANG" size="15" value="English"><br>
+                  
+                  <FONT face="Arial, Helvetica, sans-serif" size=-1><b>Code</b>&nbsp;
+                  <INPUT size="5" name="LANGMATERIAL-01:CODE">&nbsp;
+                  <FONT face="Arial, Helvetica, sans-serif" size=-1><b>Language</b>&nbsp;
+                  <INPUT size="15" name="LANGMATERIAL-01:LANG">
+                  </font><br>
+                  
+                  <FONT face="Arial, Helvetica, sans-serif" size=-1><b>Code</b>&nbsp;
+                  <INPUT size="5" name="LANGMATERIAL-02:CODE">&nbsp;
+                  <FONT face="Arial, Helvetica, sans-serif" size=-1><b>Language</b>&nbsp;
+                  <INPUT size="15" name="LANGMATERIAL-02:LANG">
+                  </font><br>
+                  
+                  <FONT face="Arial, Helvetica, sans-serif" size=-1><b>Code</b>&nbsp;
+                  <INPUT size="5" name="LANGMATERIAL-03:CODE">&nbsp;
+                  <FONT face="Arial, Helvetica, sans-serif" size=-1><b>Language</b>&nbsp;
+                  <INPUT size="15" name="LANGMATERIAL-03:LANG">
+                  </font><br>
+                  
+                  <FONT face="Arial, Helvetica, sans-serif" size=-1><b>Code</b>&nbsp;
+                  <INPUT size="5" name="LANGMATERIAL-04:CODE">&nbsp;
+                  <FONT face="Arial, Helvetica, sans-serif" size=-1><b>Language</b>&nbsp;
+                  <INPUT size="15" name="LANGMATERIAL-04:LANG">
+                  </font><br>
+                  </blockquote>
+                </TD>
+              </TR>
+            
+            <!-- Collection title -->
+            
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1>
+                  <B><a name="DidTitle">Title of Collection</a></B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif">&nbsp; </font></TD>
+              </TR>
+            
+            <!-- Proper title -->
+            
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Proper 
+                      Title:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="PROPER_TITLE" size="40">
+                  </font></TD>
+              </TR>
+            
+            <!-- DACS title -->
+            
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>DACS 
+                      Form:</B></FONT></p>
+                    <p><font size="-1" face="Arial, Helvetica, sans-serif"><em>This is the same as the <strong>Proper Title</strong>, but it's not necessary to use formal capitalization </em></font></p></blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="APPM_TITLE" size="40">
+                  </font></TD>
+              </TR>
+            
+            <!-- Filing title -->
+            
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Filing 
+                      Title:</B></FONT></p>
+                    <p><font size="-1" face="Arial, Helvetica, sans-serif"><em>This is the same as the <strong>Proper Title</strong>, with the following modifications: For papers created, collected, or associated with an individual, the filing title should begin with the individual's last name, followed by the first name and optional middle initial, which should both be in parentheses: </em></font></P>
+					<div>
+					<blockquote>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif">Abel (Theodore F.) Papers</font></p>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif">Chambrun (Rene de) Papers</font></p>
+                    <p><font size="-1" face="Arial, Helvetica, sans-serif">Branch (Francis Z.) Correspondence and Papers</font></p>
+					</blockquote
+					</div>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif"><em>When two individuals are responsible for a collection and they share the same last name, put the last name at the beginning of the filing title. Then list   both names and, optionally, a middle initial, which should both be in  parentheses: </em></font></p>
+					<DIV>
+					<BLOCKQUOTE>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif">French (Helen D. and Paul M.) Collection</font></p>
+					</BLOCKQUOTE>
+					</DIV>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif"><em>When the individuals do not share the same last name, list the most   appropriate name first, with corresponding first name following in parentheses  and then the second last name with its corresponding first name in another set   of parentheses:</em> </font></p>
+					<DIV>
+					<BLOCKQUOTE>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif">French (Helen D.) and Hightower (Paul) Collection</font></p>
+					</BLOCKQUOTE>
+					</DIV>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif"><em>Corporate names and family names should generally be listed as in their   established form or as they appear. Use appropriate abbreviations such as Corp.,   Co., Inc., Misc., Dept., etc. to maintain brevity:</em></font>              </p>
+					<BLOCKQUOTE>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif">Weihe, Frick &amp;amp; Kruse Collection</font></p>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif">Bidwell Family Papers</font></p>
+                    <p><font size="-1" face="Arial, Helvetica, sans-serif">Crowley Maritime Corp. Records</font></p></BLOCKQUOTE>
+					</blockquote>
+					</div>
+					</TD>
+                    <TD><font face="Arial, Helvetica, sans-serif"> 
+                    <INPUT name="FILETITLE" size="40">
+                    </font></TD>
+                    </TR>
+            
+            <!-- Unitdate 1 -->
+            
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>
+                <a name="DidUnitdates">Dates (Inclusive):</a></B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif">&nbsp; </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote>
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Dates:</B></FONT></p>
+                  </blockquote></TD>
+                  <TD><FONT face="Arial, Helvetica, sans-serif"><INPUT size=15 
+                  name=APPM_DATE1></FONT></TD>
+              </TR>
+               <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Normalized 
+                      ISO-8601 Form:</B></FONT></p>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif"><em>List the beginning and end date range, separated by a slash. For example:</em></font></P>
+              <P><font size="-1" face="Arial, Helvetica, sans-serif">1920/1969</font></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="ISO8601_DATE1" size="15">
+                  </font></TD>
+              </TR>
+            
+            <!-- Unitdate 2 -->
+            
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Dates (Bulk):</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif">&nbsp; </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote>
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Dates:</B></FONT></p>
+                  </blockquote></TD>
+			    <TD><FONT face="Arial, Helvetica, sans-serif"><INPUT size=15 
+            	name=APPM_DATE2></FONT></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Normalized 
+                      ISO-8601 Form:</B></FONT></p>
+					<p><font size="-1" face="Arial, Helvetica, sans-serif"><em>List the beginning and end date range, separated by a slash. For example:</em></font></p>
+                    <p><font size="-1" face="Arial, Helvetica, sans-serif">1920/1969</font></p>		
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="ISO8601_DATE2" size="15">
+                  </font></TD>
+              </TR>
+            
+            <!-- Collection number -->
+            
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1>
+                  <b><a name="CollectionNo">Collection Number:</a></b></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="CALL_NO" size="15" value="Consult library">
+                  </font></TD>
+              </TR>
+            
+            <!-- Origination 1 -->
+            
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>
+                <a name="DidOrigination">Creator or Collector 1:</a></B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="ORIGINATION1" size="40">
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><b>Heading:</b></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="ORIGINATION1_TYPE">
+                    <OPTION selected>Collector 
+                    <OPTION>Creator</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>EAD 
+                      Tag:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="ORIGINATION1_TAG">
+                    <OPTION>persname 
+                    <OPTION>famname 
+                    <OPTION selected>corpname</OPTION> 
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Source:
+                    </B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="ORIGINATION1_SOURCE">
+                    <OPTION>lcnaf 
+                    <OPTION>ulan
+					<OPTION>local
+					<OPTION value="" selected>[none]</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Rules:
+                    </B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="ORIGINATION1_RULES">
+                    <OPTION>aacr2 
+                    <OPTION selected>dacs
+					<OPTION value="">[none]</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+			  
+            <!-- Origination 2 -->
+            
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>
+                <a name="DidOrigination">Creator or Collector 2:</a></B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="ORIGINATION2" size="40">
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><b>Heading:</b></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="ORIGINATION2_TYPE">
+                    <OPTION selected>Creator 
+                    <OPTION>Collector</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>EAD 
+                      Tag:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="ORIGINATION2_TAG">
+                    <OPTION>corpname 
+                    <OPTION>famname 
+                    <OPTION selected>persname</OPTION> 
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Source:
+                    </B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="ORIGINATION2_SOURCE">
+                    <OPTION>lcnaf
+                    <OPTION>ulan
+					<OPTION value="" selected>[none]</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Rules:
+                    </B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="ORIGINATION2_RULES">
+                    <OPTION>aacr2 
+                    <OPTION selected>dacs
+					<OPTION value="">[none]</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+			  
+            <!-- Extent 1 -->
+            
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1>
+                  <b><a name="DidExtent">Extent:</a></b></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="EXTENT1" size="15">
+                  </font></TD>
+              </TR>
+            
+            <!-- Abstract -->
+            
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B><a name="DidAbstract">Abstract:</a></B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <TEXTAREA name="ABSTRACT" cols="34"></TEXTAREA>
+                  </font></TD>
+              </TR>
+
+            <!-- Physloc -->
+   
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B><a name="DidPhysloc">Physical Location:</a></B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <TEXTAREA name="PHYSLOC" cols="34">{DEFAULT_PHYSLOC}</TEXTAREA>
+                  </font></TD>
+              </TR>
+            </TBODY>
+          </TABLE>
+          <font face="Arial, Helvetica, sans-serif"> </P> </font></TD>
+      </TR>
+    </TBODY>
+  </TABLE>
+
+
+##================================================##
+## Generic Main Document Textbox                  ##
+##================================================##
+
+[Form OACMainTextArea]
+<FONT face=Arial size=-1><strong><a name="{%link}">Heading:</a></strong></FONT><font face="Arial, Helvetica, sans-serif"> 
+<INPUT size=40 value="{%head}" name="{%name}_HEAD">
+$[<font face="Arial, Helvetica, sans-serif"><strong>{%suffix}</strong></font>]$
+<BR>
+<TEXTAREA name="{%name}" rows="20" cols="80">{%value}</TEXTAREA>
+</font></p>
+<p><font face="Arial, Helvetica, sans-serif"><font face="Arial, Helvetica, sans-serif"><BR>
+</font></font>
+
+
+##================================================##
+## Main Content Controlaccess Section             ##
+##================================================##
+
+[Form OACControlAccess]
+<font face="Arial, Helvetica, sans-serif"> 
+<P><BR>
+<FONT face=Arial size=-1><strong><a name="{%link}">Heading:</a></strong></FONT>
+<input type="text" name="{%name}_HEAD" size=40 value="Subjects">
+<table cellspacing=0 cellpadding=5 border>
+{@OACControlAccessSection:name="{%name}"#{%count|15}}
+<p><em><font size="-1" face="Arial, Helvetica, sans-serif">Manually enter subject headings using these fields:
+</font>
+</em>
+
+<ul>
+  <LI><em><font size="-1" face="Arial, Helvetica, sans-serif">Each box below contains a number of pull-down menus and a field. Use the field to enter the indexing term. Use the pull-down menus to qualify the indexing term. </font></em>
+  <LI><em><font size="-1" face="Arial, Helvetica, sans-serif"><STRONG>Tag:</STRONG> Select appropriate EAD tag based on the type of   indexing term:
+    </font>
+    </em>
+    <UL>
+        <LI><font size="-1" face="Arial, Helvetica, sans-serif">persname = Personal names
+            </font>
+          
+        <LI><font size="-1" face="Arial, Helvetica, sans-serif">corpname = Corporate names   
+            </font>
+        <LI><font size="-1" face="Arial, Helvetica, sans-serif">famname = Family names   
+            </font>
+        <LI><font size="-1" face="Arial, Helvetica, sans-serif">geogname = Geographical names
+            </font>
+          
+        <LI><font size="-1" face="Arial, Helvetica, sans-serif">subject = Subjects or topical terms         </font>
+        <LI><font size="-1" face="Arial, Helvetica, sans-serif">genreform = Form/genre terms
+            </font>
+              </UL>
+  <LI><em><font size="-1" face="Arial, Helvetica, sans-serif"><STRONG>Role="subject"</STRONG>: If the indexing term is being used as a   subject (i.e., not as a co-creator or contributor, such as in the case of   personal, family, or corporate names), then click on the checkbox.   
+  </font>
+  </em>
+  <LI><em><font size="-1" face="Arial, Helvetica, sans-serif"><STRONG>Source</STRONG>: If the term was taken from an authority file or thesaurus, select the code for the source (and do not select anything in <strong>Rules</strong>).  If the term is from a locally-maintained thesaurus, do not select a code from <strong>Source</strong>; use &quot;local&quot; in the <strong>Rules</strong> field instead.
+    </font>
+    </em>
+    <ul>
+      <li><font size="-1" face="Arial, Helvetica, sans-serif">aat = Art and Architecture Thesaurus </font></li>
+      <li><font size="-1" face="Arial, Helvetica, sans-serif">gmgpc  = Thesaurus of Graphic Materials II: Genre and Physical Characteristics Terms </font></li>
+      <li><font size="-1" face="Arial, Helvetica, sans-serif">lcnaf  = Library of Congress Name Authority File </font></li>
+      <li><font size="-1" face="Arial, Helvetica, sans-serif">lcsh = Library of Congress Subject Headings </font></li>
+      <li><font size="-1" face="Arial, Helvetica, sans-serif">lctgm = Thesaurus of Graphic Materials I: Subject Terms </font></li>
+      <li><font size="-1" face="Arial, Helvetica, sans-serif">tgn = Thesaurus of Geographic Names </font></li>
+    </ul>
+  
+  <LI><em><font size="-1" face="Arial, Helvetica, sans-serif"><STRONG>Rules</STRONG>:  If the term was derived using a content standard such as AACR2, select the code for the standard (and do not select anything in <strong>Source</strong>):
+    </font>
+    </em>
+    <ul>
+      <li><font size="-1" face="Arial, Helvetica, sans-serif">aarc = Anglo-American Cataloging Rules, 2nd ed.</font></li>
+      <li><font size="-1" face="Arial, Helvetica, sans-serif">dacs = Describing Archives: A Content Standard</font></li>
+      <li><font size="-1" face="Arial, Helvetica, sans-serif">local = Local cataloging rules</font></li>
+    </ul>
+  </LI>
+  </ul>
+</table>
+<p><BR>
+
+[Form OACControlAccessSection]
+  <TR vAlign=top>
+    <TD>
+      <TABLE cellSpacing=0 cellPadding=2 border=0>
+            <TBODY>
+              <TR vAlign=center> 
+                <TD width="72"><FONT face=Arial size=-1>Tag:&nbsp;&nbsp;</FONT> 
+                </TD>
+                <TD width="88"><SELECT name={%name}:TYPE>
+                    <OPTION>corpname 
+                    <OPTION>famname 
+                    <OPTION>function 
+                    <OPTION>genreform 
+                    <OPTION>geogname 
+                    <OPTION>occupation 
+                    <OPTION selected>persname 
+                    <OPTION>subject 
+                    <OPTION>title</OPTION>
+                  </SELECT> </TD>
+                <TD colspan="2"><FONT face=Arial size=-1>Role="subject" </font>
+                  <input type="checkbox" name="{%name}:ROLE">
+                </TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><FONT face=Arial size=-1>Source:&nbsp;&nbsp;</FONT> </TD>
+                <TD><select name={%name}:SOURCE>
+                    <option value="" 
+              selected> 
+                    <option>aat
+					<option>gmgpc
+					<option>lcnaf
+					<option>lcsh
+					<option>lctah
+					<option>lctgm
+					<option>mesh
+					<option>mim
+					<option>nmc
+					<option>rbgenr
+					<option>ulan
+                    <option>tgn 
+                    <option>ulan</option>
+                  </select> </TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><FONT face=Arial size=-1>Rules:&nbsp;&nbsp;</FONT> </TD>
+                <TD><select name={%name}:RULES>
+                    <option value="" 
+              selected> 
+                    <option>aacr
+					<option>aat
+					<option>cdwa
+					<option>dacs
+					<option>gihc
+					<option>gmgpc
+					<option>lcsh
+					<option>lctgm
+					<option>local
+					<option>mesh
+					<option>mim
+					<option>nmc
+					<option>rbgenr
+					<option>tgn</option>
+                  </select> </TD>
+              </TR>
+        <TR vAlign="top">
+          <TD colspan=2>
+             <input type="text" name="{%name}:TEXT" size="71">
+          </TD>
+        </TR>
+            </TBODY>
+          </TABLE></TD></TR>
+
+
+##================================================##
+## DSC Frameset                                   ##
+##================================================##
+
+[Form DSC]
+Content-type: text/html
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+<head>
+<title>{TEMPLATE_TITLE}</title>
+</head>
+
+<frameset rows="*" cols="185,*" framespacing="0" frameborder="NO" border="0">
+  <frame src="{_URL}@OACDSCToc" name="leftFrame" noresize>
+  <frame src="{_URL}@OACDSCContent" name="mainFrame">
+</frameset>
+<noframes><body>
+
+</body></noframes>
+</html>
+
+
+##================================================##
+## DSC Content Frame                              ##
+##================================================##
+
+[Form OACDSCContent]
+Content-type: text/html
+
+<html>
+<head>
+<title>{TEMPLATE_TITLE} DSC</title>
+</head>
+<body bgColor=#c0c0c0>
+<FONT face="Arial, Helvetica, sans-serif">
+<H2><FONT face="Arial, Helvetica, sans-serif"><A name=Preliminary>OAC EAD Web 
+  Template, Version 2.0</A>: Major Subdivisions Form</FONT></H2>
+</FONT>
+<p>&nbsp;</p>
+<h2><FONT 
+face="Arial, Helvetica, sans-serif"><em>DESCRIPTION OF MAJOR SUBDIVISIONS</em></FONT></h2>
+<form action="{_URL}@DSC?submit=1" method="post" target="_blank" name="dscform">
+  <p>&nbsp;</p>
+  <TABLE width="303" border=0 cellPadding=2 cellSpacing=0>
+    <TBODY>
+      <TR vAlign=center> 
+        <TD width="59"><font size="-1" face="Arial"><strong>Type:</strong></font> </TD>
+        <TD width="200"><select name="DSC_TYPE">
+            <option selected>combined 
+            <option>analyticover 
+            <option>in-depth </option>
+          </select> </TD>
+      </TR>
+    </TBODY>
+  </TABLE>
+  <font face="Arial, Helvetica, sans-serif"> 
+  <p><font face="Arial, Helvetica, sans-serif"><FONT face=Arial size=-1><strong>Heading:</strong></FONT>
+  <font face="Arial, Helvetica, sans-serif"></font> 
+    <INPUT size=40 
+value="Collection Contents" name="DSC_HEAD">
+    </font></p>
+  </font>
+{@OACC01:name="COMPONENT",subcount="{C02_COUNT}"#{C01_COUNT}}
+<p><p>
+</form>
+</body>
+</html>
+
+[Form OACC01]
+  <TABLE cellSpacing=0 cellPadding=10 border=1>
+    <TBODY>
+      <TR vAlign=top> 
+        <TD>
+<p><strong><font face="Arial, Helvetica, sans-serif"><a name="{%name}">Component {_PLAINCOUNT}</a></font></strong></p>
+          <TABLE>
+            <TBODY>
+              <TR vAlign=top> 
+                <TD width="290"><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Level:</B></FONT></TD>
+                <TD width="240"><font face="Arial, Helvetica, sans-serif"> 
+                  <select name="{%name}:LEVEL">
+				  	  <option>subgrp
+				  	  <option selected>series
+				  	  <option>subseries
+				  	  <option>file
+				  	  <option>item</option>
+			          </select>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><b>Container 
+                  Information:</b></FONT></TD>
+                <TD>&nbsp;</TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD height="28">
+<blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Type:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif">
+                  <select name={%name}:CONTAINER_TYPE>
+                    <option selected>box
+                    <option>folder
+					<option>box-folder</option>
+                  </select>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Heading:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:CONTAINER_LABEL" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Data:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:CONTAINER" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Number 
+                  or Identifier:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITID" size=40>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Title:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITTITLE" size=40>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>
+                <a name="DidUnitdates">Date 1:</a></B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif">&nbsp; </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Type:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:UNITDATE1_TYPE">
+                    <OPTION selected>inclusive 
+                    <OPTION>single 
+                    <OPTION>bulk</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>DACS 
+                      Form:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITDATE1" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Normalized 
+                      ISO-8601 Form:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITDATE1_NORMAL" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Date 
+                  2:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif">&nbsp; </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Type:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:UNITDATE2_TYPE">
+                    <OPTION selected>bulk</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>DACS 
+                      Form :</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITDATE2" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Normalized 
+                      ISO-8601 Form:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITDATE2_NORMAL" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Creator 
+                  or Collector:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:ORIGINATION1" size=40>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><b>Heading:</b></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:ORIGINATION1_LABEL">
+                    <OPTION selected>Creator 
+                    <OPTION>Collector</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>EAD 
+                      Tag:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:ORIGINATION1_TAG">
+                    <OPTION>corpname 
+                    <OPTION>famname 
+                    <OPTION selected>persname</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Source:
+                      </B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:ORIGINATION1_SOURCE">
+                    <OPTION selected>lcnaf 
+                    <OPTION>ulan
+                    <OPTION>local
+					<OPTION value="">[none]</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Rules:
+                      </B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:ORIGINATION1_RULES">
+                    <OPTION selected>aacr2
+					<OPTION>dacs
+					<OPTION value="">[none]</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Extent:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:EXTENT" size=40>
+                  </font></TD>
+              </TR>
+            </TBODY>
+          </TABLE>
+          <p><font face="Arial, Helvetica, sans-serif">
+          <FONT face=Arial size=-1><strong>Heading:</strong></FONT><font face="Arial, Helvetica, sans-serif"></font> 
+            <INPUT size=40 name="{%name}:SCOPECONTENT_HEAD" value="Series Scope and Content Summary">
+            </font></P>
+          <p><font face="Arial, Helvetica, sans-serif">
+            <TEXTAREA name="{%name}:SCOPECONTENT" rows=10 cols=80></TEXTAREA>
+            </font> </P>
+          <P>&nbsp; 
+          <P><font face="Arial, Helvetica, sans-serif">
+          <FONT face=Arial size=-1><strong>Heading:</strong></FONT><font face="Arial, Helvetica, sans-serif"></font> 
+            <INPUT name="{%name}:ACCESSRESTRICT_HEAD" value="Access Note" size=40>
+            <BR>
+            <textarea name="{%name}:ACCESSRESTRICT" rows=5 cols=80></textarea>
+            </font>
+          <P><font face="Arial, Helvetica, sans-serif">
+          <FONT face=Arial size=-1><strong>Heading:</strong></FONT><font face="Arial, Helvetica, sans-serif"></font> 
+            <INPUT name="{%name}:USERESTRICT_HEAD" value="Use Note" size=40>
+            <BR>
+            <textarea name="{%name}:USERESTRICT" rows=5 cols=80></textarea>
+            </font> 
+          <p></P></TD>
+      </TR>
+    </TBODY>
+  </TABLE>
+{@OACC02:name="{%name}",c01_count="{_PLAINCOUNT}"#{C02_COUNT}}
+
+[Form OACC02]
+  <TABLE cellSpacing=0 cellPadding=10 border=1>
+    <TBODY>
+      <TR vAlign=top> 
+        <TD>
+<p><strong><font face="Arial, Helvetica, sans-serif"><a name="{%name}">Component {%c01_count}.{_PLAINCOUNT}</a></font></strong></p>
+          <TABLE>
+            <TBODY>
+              <TR vAlign=top> 
+                <TD width="290"><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Level:</B></FONT></TD>
+                <TD width="240"><font face="Arial, Helvetica, sans-serif"> 
+                  <select name="{%name}:LEVEL">
+				  	  <option>subgrp
+				  	  <option selected>series
+				  	  <option>subseries
+				  	  <option>file
+				  	  <option>item</option>
+                  </select>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><b>Container 
+                  Information:</b></FONT></TD>
+                <TD>&nbsp;</TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD height="28">
+<blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Type:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif">
+                  <select name={%name}:CONTAINER_TYPE>
+                    <option selected>box
+                    <option>folder
+					<option>box-folder</option>
+                  </select>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Heading:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:CONTAINER_LABEL" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Data:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:CONTAINER" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Number 
+                  or Identifier:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITID" size=40>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Title:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITTITLE" size=40>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Date 
+                  1:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif">&nbsp; </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Type:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:UNITDATE1_TYPE">
+                    <OPTION selected>inclusive 
+                    <OPTION>single 
+                    <OPTION>bulk</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>DACS 
+                      Form:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITDATE1" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Normalized 
+                      ISO-8601 Form:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITDATE1_NORMAL" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Date 
+                  2:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif">&nbsp; </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Type:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:UNITDATE2_TYPE">
+                    <OPTION selected>bulk</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>DACS 
+                      Form :</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITDATE2" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Normalized 
+                      ISO-8601 Form:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:UNITDATE2_NORMAL" size=15>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Creator 
+                  or Collector:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:ORIGINATION1" size=40>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><b>Heading:</b></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:ORIGINATION1_LABEL">
+                    <OPTION selected>Creator 
+                    <OPTION>Collector</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>EAD 
+                      Tag:</B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:ORIGINATION1_TAG">
+                    <OPTION>corpname 
+                    <OPTION>famname 
+                    <OPTION selected>persname 
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=center> 
+                <TD><blockquote> 
+                    <p><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Source:
+                      </B></FONT></p>
+                  </blockquote></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <SELECT name="{%name}:ORIGINATION1_SOURCE">
+                    <OPTION>lcnaf 
+                    <OPTION selected>aacr2 
+                    <OPTION>local
+					<OPTION value="">[none]</OPTION>
+                  </SELECT>
+                  </font></TD>
+              </TR>
+              <TR vAlign=top> 
+                <TD><FONT face="Arial, Helvetica, sans-serif" size=-1><B>Extent:</B></FONT></TD>
+                <TD><font face="Arial, Helvetica, sans-serif"> 
+                  <INPUT name="{%name}:EXTENT" size=40>
+                  </font></TD>
+              </TR>
+            </TBODY>
+          </TABLE>
+          <p><font face="Arial, Helvetica, sans-serif">
+          <FONT face=Arial size=-1><strong>Heading:</strong></FONT><font face="Arial, Helvetica, sans-serif"></font> 
+            <INPUT size=40 name="{%name}:SCOPECONTENT_HEAD" value="Subseries Scope and Content Summary">
+            </font></P>
+          <p><font face="Arial, Helvetica, sans-serif">
+            <TEXTAREA name="{%name}:SCOPECONTENT" rows=10 cols=80></TEXTAREA>
+            </font> </P>
+          <P>&nbsp; 
+          <P><font face="Arial, Helvetica, sans-serif">
+          <FONT face=Arial size=-1><strong>Heading:</strong></FONT><font face="Arial, Helvetica, sans-serif"></font> 
+            <INPUT name="{%name}:ACCESSRESTRICT_HEAD" value="Access Note" size=40>
+            <BR>
+            <textarea name="{%name}:ACCESSRESTRICT" rows=5 cols=80></textarea>
+            </font>
+          <P><font face="Arial, Helvetica, sans-serif">
+          <FONT face=Arial size=-1><strong>Heading:</strong></FONT><font face="Arial, Helvetica, sans-serif"></font> 
+            <INPUT name="{%name}:USERESTRICT_HEAD" value="Use Note" size=40>
+            <BR>
+            <textarea name="{%name}:USERESTRICT" rows=5 cols=80></textarea>
+            </font> 
+          <p></P></TD>
+      </TR>
+    </TBODY>
+  </TABLE>
+
+
+##================================================##
+## Main Document Toc Frame                        ##
+##================================================##
+
+[Form OACTocHeader]
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body bgcolor="#c0c0c0">
+<form name="dummy">
+<input type="submit" value="Submit" onClick="parent.mainFrame.document.eadform.submit()">
+<input type="reset" value="Reset" onClick="parent.mainFrame.document.eadform.reset()">
+<hr></form>
+
+[Form OACTocFooter]
+  <p>&nbsp;</p>
+</body>
+</html>
+
+[Form OACTocRequired]
+<strong><font size="-1" face="Arial, Helvetica, sans-serif"><a href="http://www.cdlib.org/inside/projects/oac/toolkit/templates/help1-2.html" target="_blank" >Template Guidelines</a>
+</font>
+</p>
+<strong><font size="-1" face="Arial, Helvetica, sans-serif"><a href="http://www.oac.cdlib.org/help/help_affiliates.cgi" target="_blank" >Help/Problems?</a></font>
+</p>
+<hr>
+<p><font face="Arial, Helvetica, sans-serif"><strong><font size="-1">
+<a href="{_URL}@OACContent#Preliminary" target="mainFrame">Preliminary 
+  Section</a></font></strong></font></p>
+<p><font size="-1"><strong><font face="Arial, Helvetica, sans-serif">
+<a href="{_URL}@OACContent#Did" target="mainFrame">Descriptive 
+  Summary</a></font></strong></font></p>
+
+[Form OACLink]
+<p><font size="-1"><strong><font face="Arial, Helvetica, sans-serif">
+<a href="{_URL}@OACContent#{%link}" target="mainFrame">{%text}</a></font></strong></font></p>
+
+##================================================##
+## DSC Toc Frame                                  ##
+##================================================##
+
+[Form OACDSCToc]
+Content-type: text/html
+
+<html>
+<head>
+<title>{TEMPLATE_TITLE} DSC</title>
+</head>
+
+<body bgColor=#c0c0c0>
+<form name="dummy">
+<input type="submit" value="Submit" onClick="parent.mainFrame.document.dscform.submit()">
+<input type="reset" value="Reset" onClick="parent.mainFrame.document.dscform.reset()">
+<hr></form>
+<a href="http://oac.cdlib.org/templates/help5.html" target="_blank" ><img src="http://oactools.cdlib.org/templates/images/help1.gif" border=0></a>
+<p>
+<strong><font size="-1" face="Arial, Helvetica, sans-serif"><a href="{_URL}@OACDSCContent#Top" target="mainFrame">Description of Major Subdivisions</a></font></strong> 
+{@OACC01Link:name="COMPONENT"#{C01_COUNT}}
+</body>
+</html>
+
+[Form OACC01Link]
+<p><font face="Arial, Helvetica, sans-serif"><strong><font size="-1">
+<a href="{_URL}@OACDSCContent#{%name}" target="mainFrame">Component {_PLAINCOUNT}</a></font></strong></font></p>
+<ul>
+{@OACC02Link:name="{%name}",c01_count="{_PLAINCOUNT}"#{C02_COUNT}}
+</ul>
+
+[Form OACC02Link]
+  <li><font size="-1"><font face="Arial, Helvetica, sans-serif">
+  <a href="{_URL}@OACDSCContent#{%name}" target="mainFrame">Component {%c01_count}.{_PLAINCOUNT}</a></font></font></li>
+
+
+
+##================================================##
+## Very top and very bottom of the HTML page      ##
+##================================================##
+
+[Form OACTemplateHeader]
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- saved from url=(0058)http://oactools.cdlib.org/cgi-bin/template/caltech-aip.tmp -->
+<HTML><HEAD><TITLE>{TEMPLATE_TITLE}</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<META content="MSHTML 5.50.4919.2200" name=GENERATOR></HEAD>
+<BODY bgColor=#c0c0c0>
+<H2><FONT face="Arial, Helvetica, sans-serif"><a name="Preliminary">{TEMPLATE_TITLE}</a></FONT>
+<FONT face="Arial, Helvetica, sans-serif"> </FONT></H2>
+<form action="{_URL}?submit=1" method="post" target="blank" name="eadform">
+
+
+[Form OACTemplateFooter]
+</FORM>
+<font face="Arial, Helvetica, sans-serif"></P></font>
+</BODY></HTML>
+
+
+##================================================##
+## Frameset                                       ##
+##================================================##
+
+[Form _DEFAULT]
+Content-type: text/html
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+<head>
+<title>{TEMPLATE_TITLE}</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<frameset rows="*" cols="185,*" framespacing="0" frameborder="YES" border="2">
+  <frame src="{_FULL_URL}@OACToc" name="leftFrame" noresize>
+  <frame src="{_FULL_URL}@OACContent" name="mainFrame">
+</frameset>
+<noframes><body>
+
+</body></noframes>
+</html>
+
+

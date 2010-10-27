@@ -1,0 +1,938 @@
+#!/usr/local/bin/perl
+##===============================================================##
+## Program name:   template                                      ##
+## Version:        2.0d                                          ##
+## Author:         Alvin Pollock (apollock@library.berkeley.edu) ##
+## Date completed: 3/31/03                                       ##
+##                 2.0e: 10/26/2004                              ##
+##                                                               ##
+## Description:    Generates a dynamic HTML form using templates ##
+##                 contained in a configuration file. Uses other ##
+##                 templates in the same configuration file to   ##
+##                 generate markup using form data. Designed for ##
+##                 creating SGML or XML files encoded using the  ##
+##                 Encoded Archival Description (EAD) DTD but    ##
+##                 can be used to generate other markup through  ##
+##                 manipulation of output templates.             ##
+##                                                               ##
+## Changes:        v.2.0e:                                       ##
+##                 - Fixed port number bug. Previously, was not  ##
+##                   saved in _SERVERURL system variable.        ##
+##                 v.2.0d:                                       ##
+##                 - Added support for template calls in markup  ##
+##                   templates. Previously they were only avail- ##
+##                   able in form templates.                     ##
+##                 v.2.0c:                                       ##
+##                 - Added sneaky trick in &ParseUrl and main    ##
+##                   programming to get XML output to work in    ##
+##                   craptacular Internet Explorer               ##
+##                 v.2.0b:                                       ##
+##                 - Fixed global template variable bug in sub   ##
+##                   ProcessForm (retained { }'s so unused vars  ##
+##                   can be cleaned up).                         ##
+##                                                               ##
+## Copyright (c) 2003 The Regents of the University of           ##
+## California. All rights reserved.                              ##
+##                                                               ##
+## IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO   ##
+## ANY PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR       ##
+## CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF THIS PROGRAM, ##
+## EVEN IF THE UNIVERSITY OF CALIFORNIA HAS BEEN  ADVISED OF THE ##
+## POSSIBILITY OF SUCH DAMAGE.                                   ##
+##                                                               ##
+## THE UNIVERSITY OF CALIFORNIA SPECIFICALLY DISCLAIMS ANY       ##
+## WARRANTIES INCLUDING, BUT NOT LIMITED TO, THE IMPLIED         ##
+## WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR    ##
+## PURPOSE. THE PROGRAM PROVIDED HEREUNDER IS ON AN "AS IS"      ##
+## BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO  ##
+## PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR       ##
+## MODIFICATIONS.                                                ##
+##===============================================================##
+use strict 'vars';
+use vars qw(%SystemVariables %State $TemplateDir $ExtensionDir %Extensions $LogFile $TestURL $TestPost);
+$SystemVariables{time} = time ();
+
+##==============================================##
+## User-defined variables                       ##
+##==============================================##
+
+$TemplateDir  = 'templates';
+
+$ExtensionDir = 'extensions';
+
+## The following can be set to test this script on the command-line
+
+#$TestURL = 'http://sunsite/cgi-bin/template/ead/bancroft?submit=1';
+
+##==============================================##
+## Main program                                 ##
+##==============================================##
+
+my ($url_params, $post_data, $config_file, $template_name, $template_call) = &ParseUrl;
+
+## Sneaky trick. If the url parser detects a .dtd file in the last part
+## of the PATH_INFO then it is crappy MSIE trying to download a DTD. The
+## actual name of the DTD is returned in $post_data so we put a perl program
+## *of the same name* as the DTD in our cgi-bin directory and execute
+## that in a require. That program simply echoes the DTD.
+
+if ($url_params eq 'dtd') {
+	require $post_data;
+} elsif ($url_params->{submit}) {
+	&GenerateMarkup ($url_params, $post_data, $config_file, $template_name, $template_call);
+} else {
+	&GenerateForm ($url_params, $post_data, $config_file, $template_name, $template_call);
+}
+
+##==============================================##
+## Form generation subroutines                  ##
+##==============================================##
+
+sub GenerateForm {
+	my ($url_params, $post_data, $config_file, $template_name, $template_call) = @_;
+	my $cfg = &ParseConfigFile ($config_file);
+	my $template_dir = $cfg->{'General Parameters'}->{TemplateDir};
+	my $template_file = "$template_dir/$template_name.cfg";
+	$cfg = &ParseConfigFile ($template_file, $cfg);
+	my $template;
+	if ($template_call) {
+		$template = $cfg->{Form}->{"Form $template_call"};
+		&Error ("null_template_call", $template_call) unless $template;
+	} else {
+		$template = $cfg->{Form}->{'Form _DEFAULT'};
+	}
+	$template = &ProcessForm ($cfg, $template);
+	$template = &CleanTemplate ($template);
+	print $template;
+}
+
+## This subroutine loops through all values of the the $cfg.
+## It first recursively substitutes all Form calls ( {@FormName} )
+## with the text of the corresponding subform and fills in all
+## form parameter variables ( {%varname} ).
+
+sub ProcessForm {
+	my ($cfg, $template, $template_vars) = @_;
+	while ($template =~ /(\{@([A-Z][^@\n\r]*)\})/g) {
+		my $template_string = $1;
+		my $template_text = $2;
+		my ($repeat, $subtemplate_name);
+		my $vars = {};
+		if ($template_text =~ /^([A-Za-z0-9_]+):(.+)/) {
+			$subtemplate_name = $1;
+			my $var_string = $2;
+			if ($var_string =~ /(.*)#([^#]+)$/) {
+				$var_string = $1;
+				$repeat = $2;
+				if ($repeat =~ /(\{%([A-Za-z0-9_]+)(\|([^\{\}\r\n]*))?\})/) {
+					my $repeat_string     = $1;
+					my $repeat_name       = $2;
+					my $alt_repeat_string = $3;
+					my $alt_repeat_value  = $4;
+					if ($vars->{$repeat_name} or $vars->{$repeat_name} eq "0") {
+						$repeat = $vars->{$repeat_name};
+					} elsif ($alt_repeat_string) {
+						$repeat = $alt_repeat_value;
+					}
+				} elsif ($repeat =~ /(\{([A-Za-z0-9_]+)(\|([^\{\}\r\n]*))?\})/) {
+					my $repeat_string     = $1;
+					my $repeat_name       = $2;
+					my $alt_repeat_string = $3;
+					my $alt_repeat_value  = $4;
+					if ($cfg->{'Global Template Variables'}->{$repeat_name} or $cfg->{'Global Template Variables'}->{$repeat_name} eq "0") {
+						$repeat = $cfg->{'Global Template Variables'}->{$repeat_name};
+					} elsif ($alt_repeat_string) {
+						$repeat = $alt_repeat_value;
+					}
+				}
+				if ($repeat >= 100) {
+					&Error ("high_count", $template_string);
+				}
+			} else {
+				$repeat = 1;
+			}
+			
+			# First substitute \" with something else
+			$var_string =~ s/\\"/^@@^/g;
+			while ($var_string =~ /([A-Za-z0-9_]+)="([^"]+)"/g) {
+				my $vname = $1;
+				my $vvalue = $2;
+				# Now restore the backsplashed quotes as real quotes
+				$vvalue =~ s/\^\@\@\^/"/g;
+				$vvalue =~ s/\\n/\n/g;
+				if ($vvalue =~ /^\{([^\{\}]+)\}$/) {
+					my $global_name = $1;
+					if ($global_name =~ /([^\|]+)\|([^\|]+)/) {
+						$global_name = $1;
+					}
+					if (defined $cfg->{'Global Template Variables'}->{$global_name}) {
+						$vvalue = $cfg->{'Global Template Variables'}->{$global_name};
+					}
+				}
+				$vars->{$vname} = $vvalue;
+			}
+			
+		} elsif ($template_text =~ /([A-Za-z0-9_]+)#([^#]+)$/) {
+			$subtemplate_name = $1;
+			$repeat = $2;
+			if ($repeat =~ /(\{%([A-Za-z0-9_]+)(\|([^\{\}\r\n]*))?\})/) {
+				my $repeat_string     = $1;
+				my $repeat_name       = $2;
+				my $alt_repeat_string = $3;
+				my $alt_repeat_value  = $4;
+				if ($vars->{$repeat_name} or $vars->{$repeat_name} eq "0") {
+					$repeat = $vars->{$repeat_name};
+				} elsif ($alt_repeat_string) {
+					$repeat = $alt_repeat_value;
+				}
+			}
+			if ($repeat >= 100) {
+				&Error ("high_count", $template_string);
+			}
+		} else {
+			$subtemplate_name = $template_text;
+			$repeat = 1;
+		}
+		my $name = "Form $subtemplate_name";
+		my $subtemplate = $cfg->{Form}->{$name};
+		$subtemplate = &ReplFormVars ($subtemplate, $cfg, $vars, $repeat);
+		
+		my $repl_text;
+		for (my $i = 1; $i <= $repeat; $i++) {
+			my $sub = $subtemplate;
+			my $counter = sprintf ("%02d", $i);
+			my $decr = $i - 1;
+			my $add  = $i + 1;
+			my $decr_counter = sprintf ("%02d", $decr);
+			my $add_counter = sprintf ("%02d", $add);
+			$sub =~ s/\{_COUNT\}/$counter/g;
+			$sub =~ s/\{_PLAINCOUNT\}/$i/g;
+			$sub =~ s/\{_COUNT--\}/$decr_counter/g;
+			$sub =~ s/\{_PLAINCOUNT--\}/$decr/g;
+			$sub =~ s/\{_COUNT\+\+\}/$add_counter/g;
+			$sub =~ s/\{_PLAINCOUNT\+\+\}/$add/g;
+			$repl_text .= $sub;
+		}
+
+		## Recurse! But check for templates which call themselves either
+		## directly or indirectly.
+		
+		if (grep (/^$name$/, @{$State{subtemplates}})) {
+			my $path = join ('->', @{$State{subtemplates}});
+			$path .= "->$name";
+			$path =~ s/\b$name\b/<b><u>$name<\/u><\/b>/g;
+			&Error ("recurse", $name, $path);
+		} else {
+			# Here the push and pop just keep track of which templates have
+			# been called to guarantee against infinite recursion
+			push @{$State{subtemplates}}, $name;
+			$repl_text = &ProcessForm ($cfg, $repl_text, $template_vars);
+			pop @{$State{subtemplates}};
+		}
+
+		## Process the subtemplate by supplying the correct indentation
+		## (just so the HTML source looks nice and is easier to proof)
+		
+		my $indent;
+		if ($State{indentation}->{Form}->{$template_string}) {
+			$indent = $State{indentation}->{Form}->{$template_string};
+			$repl_text =~ s/\n/\n$indent/g;
+			$repl_text =~ s/$indent$//;
+		}
+		
+		$template =~ s/\Q$template_string\E\n?/$repl_text/g;
+
+	}
+
+	## Replace system variables
+	while ($template =~ /(\{(_[A-Z0-9_]+)\})/g) {
+		my $var_string = $1;
+		my $var_name   = $2;
+		if ($SystemVariables{$var_name} or $SystemVariables{$var_name} eq "0") {
+			my $value = $SystemVariables{$var_name};
+			$template =~ s/\Q$var_string\E/$value/g;
+		}
+	}
+	
+	## Replace Global Template Variables
+	while ($template =~ /(\{([A-Z][A-Z0-9_]*)\})/g) {
+		my $var_string = $1;
+		my $var_name   = $2;
+		my $alt_value;
+		if ($var_name =~ /([^\|]+)\|([^\|]+)/) {
+			$var_name = $1;
+			$alt_value = $2;
+		}
+		my $var_value  = $cfg->{'Global Template Variables'}->{$var_name};
+		if ($var_value or $var_value eq "0") {
+			$template =~ s/\Q$var_string\E/$var_value/g;
+		} elsif ($alt_value) {
+			$template =~ s/\Q$var_string\E/$alt_value/g;
+		}
+	}
+	return $template;
+}
+
+sub ReplFormVars {
+	my ($template, $cfg, $vars, $repeat) = @_;
+	
+	if ($vars->{'selected'}) {
+		my $value = $vars->{'selected'};
+		$template =~ s/(<option\s+value="$value")/$1 selected/;
+	}
+	
+	## This pattern matches, e.g., {%varname} or {%varname|default} or even {%varname|}
+	while ($template =~ /(\{%([A-Za-z0-9_]+)(\|([^\{\}\r\n]*))?\})/g) {
+		my $var_string = $1;
+		my $var_name   = $2;
+		my $alt_string = $3;
+		my $alt_value  = $4;
+		if ($vars->{$var_name} or $vars->{$var_name} eq "0") {
+			my $value = $vars->{$var_name};
+			
+			## {%name} is a special template variable. If you call a template
+			## using the repeat syntax, a {%name} variable will get a -1, -2, -3,
+			## etc., appended onto the end.
+			
+			if ($repeat > 1 and $var_name eq "name") {
+				$template =~ s/\Q$var_string\E/$value-{_COUNT}/g;
+			} else {
+				$template =~ s/\Q$var_string\E/$value/g;
+			}
+		} elsif ($alt_string) {
+			$template =~ s/\Q$var_string\E/$alt_value/g;
+		}
+	}
+
+	return $template;
+}
+
+
+
+##==============================================##
+## Markup generation subroutines                ##
+##==============================================##
+
+sub GenerateMarkup {
+	my ($url_params, $post_data, $config_file, $template_name) = @_;
+	my $post_tree = &StructurePostData ($post_data);
+	my $cfg = &ParseConfigFile ($config_file);
+	&ImportExtensions ($cfg);
+	my $template_dir = $cfg->{'General Parameters'}->{TemplateDir};
+	my $template_file = "$template_dir/$template_name.cfg";
+	$cfg = &ParseConfigFile ($template_file, $cfg);
+	my $template;
+	if ($template_call) {
+		$template = $cfg->{Template}->{"Template $template_call"};
+		&Error ("null_template_call", $template_call) unless $template;
+	} else {
+		$template = $cfg->{Template}->{'Template _DEFAULT'};
+	}
+	$template = &ProcessTemplate ($cfg, $template, $post_data, $post_tree);
+	$template = &CleanTemplate ($template, $cfg);
+	if ($cfg->{'General Parameters'}->{PostProcess}) {
+		my $post_process_string = $cfg->{'General Parameters'}->{PostProcess};
+		my @post_processors = split (/,/, $post_process_string);
+		foreach my $post_process (@post_processors) {
+			my $extension = $Extensions{$post_process};
+			&Error ("no_extension", $post_process, "General Parameters") unless $extension;
+			$template = $extension->($cfg, $template, $post_data, $post_tree, '', $template);
+		}
+	}
+	print $template;
+}
+
+sub ProcessTemplate {
+	my ($cfg, $template, $post_data, $post_tree, $node_fields) = @_;
+
+	## Import template calls
+	
+	while ($template =~ /(\{@([A-Za-z0-9_]+)\})/g) {
+		my $var_string = $1;
+		my $var_name   = $2;
+		my $temp = $cfg->{Template}->{"Template $var_name"};
+		my $indent;
+		if ($State{indentation}->{Template}->{$var_string}) {
+			$indent = $State{indentation}->{Template}->{$var_string};
+			$temp =~ s/\n/\n$indent/g;
+			$temp =~ s/$indent$//;
+		}
+		if ($temp) {
+			$template =~ s/\Q$var_string\E\n*/$temp/g;
+		} else {
+			$template =~ s/\Q$var_string\E(\n*)/\{\$_NOTHING\}$1/g;
+		}
+	}
+		
+	## Process flags first ( {|$VAR1|$VAR2|} ). Only process input flags
+	## (starts with a $). Leave other flags for later.
+
+	while ($template =~ /(\{\|([^\{\}\s \n\r]+)\|\})/g) {
+		my $var_string = $1;
+		my $var_name = $2;
+		next unless $var_name =~ /\$/;
+		## Compound flags ( {|$VAR1|$VAR2|$VAR3|} )
+
+		if ($var_name =~ /\|/) {
+			my @vars = split (/\|/, $var_name);
+			foreach my $var (@vars) {
+				next unless $var =~ /^\$/;
+				$var =~ s/^\$//;
+				my $value;
+				if ($node_fields) {
+					$value = $node_fields->{$var};
+				} else {
+					$value = $post_data->{$var};
+				}
+				if ($value or $value eq "0") {
+					$template =~ s/\Q$var_string\E//g;
+					last;
+				}
+			}
+
+		## Simple flags ( {|$VAR|} )
+		
+		} else {
+			my $value;
+			$var_name =~ s/^\$//;
+			if ($node_fields) {
+				$value = $node_fields->{$var_name};
+			} else {
+				$value = $post_data->{$var_name};
+			}
+			if ($value or $value eq "0") {
+				$template =~ s/\Q$var_string\E//g;
+			}
+		}
+	}
+
+	## Simple substitution variables ( {$VARNAME} {$VARNAME|Alt text})
+
+	while ($template =~ /(\{\$([-A-Z0-9_:]+)(\|([^\{\}\r\n]*))?\})/g) {
+		my $var_string = $1;
+		my $var_name   = $2;
+		my $alt_string = $3;
+		my $alt_text   = $4;
+		my $var_value;
+		if ($node_fields) {
+			$var_value  = $node_fields->{$var_name};
+		} else {
+			$var_value  = $post_data->{$var_name};
+		}
+		if ($var_value or $var_value eq "0") {
+			$template =~ s/\Q$var_string\E/$var_value/g;
+		} elsif ($alt_string) {
+			$template =~ s/\Q$var_string\E/$alt_text/g;
+		}
+	}
+	
+	## Extended substitution variables ( {$VARNAME->extension1,extension2} )
+	while ($template =~ /(\{\$([-A-Z0-9_]+)->([A-Za-z0-9_,\(\)]+)(\|([^\{\}\r\n]*))?\})/g) {
+		my $var_string = $1;
+		my $var_name   = $2;
+		my $ext_string = $3;
+		my $alt_string = $4;
+		my $alt_text   = $5;
+		my @extensions = split (/,/, $ext_string);
+		my $text;
+		foreach my $extension_name (@extensions) {
+			my $extension_param;
+			if ($extension_name =~ /([^\(\)]+)(\(([^\(\)]+)\))/) {
+				$extension_name = $1;
+				$extension_param = $3;
+			}
+			my $extension = $Extensions{$extension_name};
+			&Error ("no_extension", $extension_name, $var_string) unless $extension;
+			$text = $extension->($cfg, $template, $post_data, $post_tree, $var_name, $text, $node_fields, $extension_param);
+		}
+		if ($text or $text eq '0') {
+			$template =~ s/\Q$var_string\E/$text/g;
+		} elsif ($alt_string) {
+			$template =~ s/\Q$var_string\E/$alt_text/g;
+		}
+	}
+	
+	## Compound substitution variables ( {$VARNAME*} )
+	
+	while ($template =~ /(\{\$([-A-Z0-9_]+)\*(\|([^\{\}\r\n]*))?\})/g) {
+		last if $node_fields;
+		my $var_string = $1;
+		my $var_name   = $2;
+		my $alt_string = $3;
+		my $alt_text   = $4;
+		my $subtemplate = $cfg->{Template}->{"Template $var_name"};
+		my $node = $post_tree->{$var_name};
+		my $repl_text;
+		while ($node) {
+			$repl_text .= &ProcessTemplate ($cfg, $subtemplate, $post_data, $node, $node->{fields});
+			$node = $node->{next};
+		}
+		my $indent;
+		if ($State{indentation}->{Template}->{$var_string}) {
+			$indent = $State{indentation}->{Template}->{$var_string};
+			$repl_text =~ s/\n/\n$indent/g;
+			$repl_text =~ s/$indent$//;
+		}
+		$template =~ s/\Q$var_string\E\n?/$repl_text/g;
+	}
+	
+	return $template;
+	
+}
+
+## This is just used for testing when needed
+
+sub Recurse {
+	my ($node) = @_;
+	if ($node) {
+		print STDERR $node->{path}, "->{next} = ";
+		print STDERR $node->{next}->{path} if $node->{next};
+		print STDERR "\n";
+		print STDERR $node->{path}, "->{sub} = ";
+		print STDERR $node->{sub}->{path} if $node->{sub};
+		print STDERR "\n";
+		&Recurse ($node->{sub});
+		&Recurse ($node->{next});
+	}
+}
+
+## This takes a series of form names that look like this:
+## NAME:FIELD1, NAME-01-06:FIELD3, NAME-02-02-07-01:FIELD4, etc.,
+## and creates a tree structure out of them. This is utilized
+## directly in the template markup generation subroutines and
+## is also available for the convenience of extension authors.
+
+sub StructurePostData {
+	my $post_data = shift;
+	my %path_keys;
+	my $post_tree = {};
+	foreach my $key (sort by_prefix keys %{$post_data}) {
+		my $value = $post_data->{$key};
+		my ($path, $field);
+		$key =~ /([^:]+):([^:]+)/ && ($path = $1, $field = $2);
+		if ($path_keys{$path}) {
+			$path_keys{$path}->{fields}->{$field} = $value;
+		} else {
+			my $var_name;
+			$key =~ /^([A-Z0-9_]+)/ && ($var_name = $1);
+			my $node = {};
+			$node->{fields}->{$field} = $value;
+			$node->{key} = $key;
+			$node->{path} = $path;
+			$node->{level} = ($path =~ tr/-/-/ + 1);
+			&BuildTree ($node, $var_name, $post_tree);
+			$path_keys{$path} = $node;
+		}
+	}
+	
+	return $post_tree;
+}
+
+{
+my @stack;     # static variable
+sub BuildTree {
+	my ($node, $var_name, $post_tree) = @_;
+	my $key = $node->{key};
+	my $level = $node->{level};
+	if ($post_tree and !$post_tree->{$var_name}) {
+		undef @stack;
+	}
+	$post_tree->{$var_name} = $node unless $post_tree->{$var_name};   # This fixes the root of the tree
+	if (@stack) {
+		if ($level <= $stack[$#stack]->{level}) {
+			my $i = ($#stack + 2) - $level;
+			while ($i > 0) {
+				my $item = pop @stack;
+				$i--;
+			}
+			$stack[$#stack]->{next} = $node;
+			pop @stack;
+			push @stack, $node;
+		} else {
+			$stack[$#stack]->{sub} = $node;
+			push @stack, $node;
+		}
+	} else {
+		push @stack, $node;
+	}
+}
+}
+
+
+## Sorting algorithm used in &StructurePostData
+
+sub by_prefix {
+	my $temp_a = $a;
+	my $temp_b = $b;
+	$temp_a =~ s/:[^:]+//;
+	$temp_b =~ s/:[^:]+//;
+	if ($temp_a gt $temp_b) {
+		return 1;
+	} elsif ($temp_b gt $temp_a) {
+		return -1;
+	} else {
+		return 0;
+	}
+}
+
+sub ReplTemplateVars {
+	my ($template, $cfg, $post_data, $post_name, $template_name) = @_;
+	
+	## This pattern matches, e.g., {%varname} or {%varname|default} or even {%varname|}
+	while ($template =~ /(\{%([A-Za-z0-9_]+)(\|([^\{\}\r\n]*))?\})/g) {
+	
+	}
+	return $template;
+}
+
+sub ImportExtensions {
+	my $cfg = shift;
+	my $extension_name = $cfg->{'General Parameters'}->{Extension};
+	if ($extension_name) {
+		my $extension_path = "$ExtensionDir/$extension_name.ext";
+		&Error ("no_extension_file", $extension_name) unless -e $extension_path;
+		require $extension_path;
+	}
+}
+
+##==============================================##
+## Utility subroutines                          ##
+##==============================================##
+
+sub ParseConfigFile {
+	my ($config_file, $cfg) = @_;
+	open (CONFIG, $config_file) || &Error ("open_template", $config_file, $!);
+	my ($current, $template_name, $form_name);
+	$cfg = {} unless $cfg;
+	while (my $line = <CONFIG>) {
+		next if $line =~ /^##/;
+		$line =~ s/\{_TIME\}/$SystemVariables{time}/g;
+		if ($line =~ /^\[Template\s+([^\]]+)\]\s*$/i) {
+			$template_name = $1;
+			if ($cfg->{Template} && $cfg->{Template}->{"Template $template_name"}) {
+				$cfg->{Template}->{"Template $template_name"} = "";
+			}
+			undef $current;
+			undef $form_name;
+		} elsif ($line =~ /^\[Form\s+([^\]]+)\]\s*$/i) {
+			$form_name = $1;
+			if ($cfg->{Form} && $cfg->{Form}->{"Form $form_name"}) {
+				$cfg->{Form}->{"Form $form_name"} = "";
+			}
+			undef $current;
+			undef $template_name;
+		} elsif ($line =~ /^\[([^\]]+)\]\s*$/i) {
+			$current = $1;
+			undef $template_name;
+			undef $form_name;
+		} elsif ($current) {
+			next if $line =~ /^\s*$/;
+			chomp $line;
+			my ($key, $value);
+			$line =~ /^([^\s]+)\s+(.*)$/ && ($key = $1, $value = $2);
+			$value =~ s/\s+$//;
+			$cfg->{$current}->{$key} = $value;
+		} elsif ($template_name) {
+			$cfg->{Template}->{"Template $template_name"} .= $line;
+
+			## This just keeps track of the indentation of template calls so it
+			## can be translated to the template text before substitution. It makes
+			## your HTML or SGML/XML easier to proof if it's not looking right.
+			
+			if ($line =~ /^(\s+)(\{@[^\{\}]+\})/) {
+				my $indent = $1;
+				my $template_string = $2;
+				$State{indentation}->{Template}->{$template_string} = $indent;
+			}
+			if ($line =~ /^(\s+)(\{\$[^\{\}]+\})/) {
+				my $indent = $1;
+				my $template_string = $2;
+				$State{indentation}->{Template}->{$template_string} = $indent;
+			}
+		} elsif ($form_name) {
+			$cfg->{Form}->{"Form $form_name"} .= $line;
+			if ($line =~ /^(\s+)(\{@[^\{\}]+\})/) {
+				my $indent = $1;
+				my $template_string = $2;
+				$State{indentation}->{Form}->{$template_string} = $indent;
+			}
+		}
+	}
+	close (CONFIG);
+	
+	## This just gets rid of extra blank lines at the end of each template or form.
+	
+	foreach my $category ('Form', 'Template') {
+		foreach my $key (keys %{$cfg->{$category}}) {
+			$cfg->{$category}->{$key} =~ s/\r//g;
+			$cfg->{$category}->{$key} =~ s/\s+$//g;
+			$cfg->{$category}->{$key} =~ s/\n*$//g;
+			$cfg->{$category}->{$key} .= "\n";
+		}
+	}
+	return $cfg;
+}
+
+## This swaps in system and global template variables, resolves associated 
+## text blocks ( $[ ... ]$ ) and finally deletes all unused variables.
+##****
+sub CleanTemplate {
+	my ($template, $cfg) = @_;
+	while ($template =~ /(\{([A-Z0-9_]+(\|[^\{\}]*)?)\})/g) {
+		my $var_string = $1;
+		my $var_name = $2;
+		my $alt_value;
+		if ($var_name =~ /([^\|]+)\|([^\|]*)/) {
+			$var_name = $1;
+			$alt_value = $2;
+		}
+		if (defined $cfg->{'Global Template Variables'}->{$var_name}) {
+			my $var_value = $cfg->{'Global Template Variables'}->{$var_name};
+			$template =~ s/\Q$var_string\E/$var_value/g;
+		} elsif ($alt_value or $alt_value eq '0') {
+			$template =~ s/\Q$var_string\E/$alt_value/g;
+		}
+	}
+	while ($template =~ /(\$\[([\w\W]+?)\]\$\n?)/g) {
+		my $block_string = $1;
+		my $block_text   = $2;
+		
+		## Process alt text segments
+		if ($block_text =~ /\|\|/) {
+			my @segments = split (/\|\|/, $block_text, -1);
+			my $default_segment = pop @segments;
+			my $repl_text;
+			foreach my $seg (@segments) {
+				if ($seg =~ /\{[-A-Za-z0-9_&*\$%|][^\{\}\n\r]*:?\}/) {
+					next;
+				} else {
+					$repl_text = $seg;
+					last;
+				}
+			}
+			$repl_text = $default_segment unless $repl_text;
+			$template =~ s/\Q$block_string\E/$repl_text/g;
+		} elsif ($block_text =~ /\{[-A-Za-z0-9_&*\$%|][^\{\}\n\r]*:?\}/) {
+			#print STDERR "$block_text\n";
+			$template =~ s/\Q$block_string\E//g;
+		}
+	}
+	
+	$template =~ s/\$\[//g;
+	$template =~ s/\]\$//g;
+	$template =~ s/\{[A-Z_&*\$%|][^\{\}\r\n]*\}//g;
+	return $template;
+}
+
+## http://www.blah.edu/cgi-bin/template/ead/hoover
+## The name of this subroutine is slightly misleading. It also processes
+## POST form data in addition to the url.
+
+sub ParseUrl {
+	my $pathinfo     = $ENV{'PATH_INFO'};
+	my $server       = $ENV{'SERVER_NAME'};
+	my $script       = $ENV{'SCRIPT_NAME'};
+	my $query_string = $ENV{'QUERY_STRING'};
+	my $port         = ':' . $ENV{'SERVER_PORT'} unless $ENV{'SERVER_PORT'} eq '80';
+	$server = "$server$port";
+	
+	## Here we make it possible to test this script on the command line. If
+	## $ENV{'SERVER_NAME'} doesn't exist we assume it's being tested and use
+	## a variety of test parameters defined at the start.
+	
+	unless ($server) {
+		my $url = $TestURL;
+		my $front;
+		$url =~ /([^?]+)\?(.+)/ && ($url = $1, $query_string = $2);
+		$url =~ /(.*)(\/[^\/]+\/[^\/]+)$/ && ($front = $1, $pathinfo = $2);
+		$front =~ /http:\/\/([^\/]+)(\/.*)/ && ($server = $1, $script = $2);
+	}	
+	
+	## Parse out the PATH_INFO. This yields the root configuration file
+	## and the child configuration file. We always know where the root
+	## config file is ($TemplateDir) but not where the child is because
+	## that directory is defined in the root file. We know what the name
+	## is though ($child_config.cfg), but not it's directory until the
+	## root file is parsed.
+	
+	my ($config_file, $template_name, $template_call);
+	if ($pathinfo =~ /^(\/([^\/]+)\/([^\/]+))\/([^\/]+)/) {
+		$pathinfo = $1;
+	}
+	if ($pathinfo =~ /^\/([^\/]+)\/([^\/]+)/) {
+		$config_file  = $1;
+		$template_name = $2;
+		
+		## Sneaky trick to get xml output to work on crappy Internet Explorer
+		if ($template_name =~ /\.dtd/) {
+			return ('dtd', $template_name);
+		}
+		if ($template_name =~ /([^@]+)@([^@]+)/) {
+			$template_name = $1;
+			$template_call = $2;
+		}
+	} else {
+		&Error ("url_path");
+	}
+	$config_file = "$TemplateDir/$config_file.cfg";
+	
+	$SystemVariables{_SCRIPT_URL}    = "http://$server$script";
+	$SystemVariables{_PATH_INFO}     = $pathinfo;
+	$SystemVariables{_TEMPLATE_FILE} = $template_name;
+	$SystemVariables{_FULL_URL}      = "http://$server$script$pathinfo";
+	$pathinfo =~ s/@.*//;
+	$SystemVariables{_URL}           = "http://$server$script$pathinfo";
+	if ($template_call) {
+		$SystemVariables{_TEMPLATE_NAME} = $template_call;
+	} else {
+		$SystemVariables{_TEMPLATE_NAME} = "_DEFAULT";
+	}
+	
+	## Parse out any QUERY_STRING parameters. By default only one is ever
+	## specially defined or used, "submit=1". But an extension may choose
+	## to take advantage of others.
+	
+	my $url_params = {};
+	foreach my $param (split(/&/, $query_string)) {
+		my ($key, $value) = split (/=/, $param);
+		$value =~ s/%([\dA-Fa-f][\dA-Fa-f])/pack("C", hex($1))/eg;
+		$value =~ s/\+/ /g;
+		$url_params->{$key} = $value if defined $value;
+	}
+	
+	## The special 'template' query string parameter is an alternate way
+	## to specify the name of a template
+	
+	if ($url_params->{template}) {
+		$template_call = $url_params->{template};
+		$SystemVariables{_TEMPLATE_NAME} = $template_call;
+	}
+	
+	## Parse out the POST form data. Squirrel it away into a big $post_data
+	## hash reference. We won't try to structure it in any way at this point.
+	## That's best done in the individual extension.
+	
+	my $form_content;
+	my $post_data = {};
+	
+	## Again, this allows testing from the command line
+	
+	if ($ENV{'SERVER_NAME'}) {
+		read (STDIN, $form_content, $ENV{'CONTENT_LENGTH'});
+	} else {
+		$form_content = $TestPost;
+	}
+	
+	my @key_value_pairs = split(/&/, $form_content);
+	foreach my $key_value (@key_value_pairs) {
+		my ($key, $value) = split (/=/, $key_value);
+		$value =~ tr/+/ /;
+		$value =~ s/%0D%0A/\n/g;
+		$value =~ s/%([\dA-Fa-f][\dA-Fa-f])/pack("C", hex($1))/eg;
+		$value =~ s/\\n/\n/g;
+		$key =~ s/%([\dA-Fa-f][\dA-Fa-f])/pack("C", hex($1))/eg;
+		$key =~ s/\+/ /g;
+		$post_data->{$key} = $value;
+	}
+	
+	return ($url_params, $post_data, $config_file, $template_name, $template_call);
+}
+
+sub Error {
+	my ($type, $param1, $param2) = @_;
+	print "Content-type: text/html\n\n";
+	print "<html>\n";
+	print "<head>\n";
+	print "<title>Template error</title>\n";
+	print "</head>\n";
+	print "<body>\n";
+	print "<h2>Template error</h2>\n";
+
+	##----------------------------------------##
+	## Value for count too high               ##
+	##----------------------------------------##
+
+if ($type eq "high_count") {
+print <<EOF;
+<p>Template counters must be less than 100. The counter in <b><tt>$param1</tt></b> is too large</p>
+EOF
+
+
+	##----------------------------------------##
+	## Recursive template call                ##
+	##----------------------------------------##
+
+} elsif ($type eq "recurse") {
+print <<EOF;
+<p>Attempt to recursively call template <b>$param1</b></p>
+<p><tt>$param2</tt></p>
+EOF
+
+
+	##----------------------------------------##
+	## Invalid URL                            ##
+	##----------------------------------------##
+
+} elsif ($type eq "open_template") {
+print <<EOF;
+<p>Could not open template: $param1, $param2</p>
+EOF
+
+
+	##----------------------------------------##
+	## Invalid PATH_INFO                      ##
+	##----------------------------------------##
+
+} elsif ($type eq "url_path") {
+print <<EOF;
+<p>Invalid path: $param1, $param2</p>
+EOF
+
+
+	##----------------------------------------##
+	## Extension file doesn't exist           ##
+	##----------------------------------------##
+
+} elsif ($type eq "no_extension_file") {
+print <<EOF;
+<p>Could not find extension file for extension "$param1"</p>
+EOF
+
+
+
+	##----------------------------------------##
+	## Extension subroutine not found         ##
+	##----------------------------------------##
+
+} elsif ($type eq "no_extension") {
+print <<EOF;
+<p>There was no extension "$param1" matching token "$param2"</p>
+EOF
+
+
+
+	##----------------------------------------##
+	## Requested form template not found      ##
+	##----------------------------------------##
+
+} elsif ($type eq "null_template_call") {
+my $template_call = "@" . $param1;
+print <<EOF;
+<p>The form template url parameter <b>$template_call</b> does not correspond to
+any form template.</p>
+EOF
+
+
+
+}
+
+	print "</body>\n";
+	print "</html>\n";
+	exit;
+}
+
+##==============================================##
+## Logging subroutines                          ##
+##==============================================##
+
+

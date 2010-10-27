@@ -1,0 +1,678 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- BEGIN METADATA -->
+<title>Inside CDL: OAC EAD Web Templates Guide</title>
+
+<meta name="description" content="" />
+<!-- END METADATA -->
+
+
+<!--#include virtual="/includes/insidecdl-styles.html" -->
+</head>
+<body>
+<div class="box-wrap">
+<div class="header"><!--#include virtual="/includes/insidecdl-header.html" --></div>
+<div class="columns-float">
+<div class="column-one"><div class="column-one-content">
+<!--#include virtual="/includes/insidecdl-left.html" -->
+<!--#include virtual="/includes/insidecdl-left-oac.html" -->
+
+
+<!-- SEE ALSO --></div></div>
+<div class="column-two">
+<div class="column-two-content"><!--#exec cmd="perl /cdldir/scripts/breadcrumb.pl"-->
+<div class="doc-body"><!-- BEGIN DOCUMENT BODY -->
+<h1>OAC EAD Web Templates Guide</h1>   <h2>3. High Level Description Form: Required Fields</h2>
+      <p>Use these fields to enter data specified as required by the OAC BPG EAD.</p>
+      <hr /> <h2>Preliminary Section</h2>
+      <hr /> <h4>Finding Aid Type</h4>
+          <ul>
+            <li>Select the type of finding aid for finding aid title, such as 
+
+              &quot;Guide&quot;, &quot;Inventory&quot;, or &quot;Register&quot;. 
+              Do not include additional information.</li>
+            <li>The template will create a title for the finding aid (not the 
+              collection) by appending the information supplied in <strong>Title 
+              (Proper Title)</strong> to the information supplied in this field.</li>
+            <li>Do not include punctuation at the end of the text.</li>
+          </ul>
+      <h4>Processed by</h4>
+      <ul>
+        <li>Enter the name of the processor of the collection.</li>
+        <li>Do not include punctuation at the end of the text.</li>
+      </ul>
+      <div style="margin-left: 2em"><i>Example:</i> </div>
+      <div style="margin-left: 2em"> Jane J. Doe</div>
+      <h4>Date Completed</h4>
+      <ul>
+        <li>Enter the year processing was completed for the collection; add month 
+          and/or day if desired.</li>
+        <li>Do not include punctuation at the end of the text.</li>
+
+      </ul>
+      <div style="margin-left: 2em"><i>Example:</i> </div>
+      <div style="margin-left: 2em"> 2003</div>
+      <h4>Encoded by</h4>
+      <ul>
+        <li>Enter the name of the encoder of the EAD file.</li>
+        <li>Do not include punctuation at the end of the text.</li>
+      </ul>
+      <div style="margin-left: 2em"><i>Example:</i> </div>
+      <div style="margin-left: 2em"> John D. Doe</div>
+      <h4>Filename</h4>
+      <ul>
+        <li>Enter a file name for this EAD file according to the following rules: 
+          <ul>
+                <li>Filenames should end with a &quot;.xml&quot; extension.</li>
+            <li>Filenames should not contain spaces. </li>
+            <li>Filenames may only include lowercase letters and numbers, underscore 
+              or dash.</li>
+            <li>Periods may only be used for the file extension. Do not include 
+              punctuation at the end of the text. </li>
+          </ul>
+        </li>
+      </ul>
+      <blockquote> 
+
+        <p><em>Examples of valid filenames:</em><br />
+              mss000261.xml<br />
+          bay-pap004.xml <br />
+              plen_session.xml<br />
+              p23.xml<br />
+          arequipa.xml</p>
+        <p><em>Examples of invalid filenames: </em><br />
+              plen.session.xml<br />
+              sntrecs:corr.xml<br />
+              Hansen.xml<br />
+          fogerty.XML</p>
+      </blockquote>
+      <h4>Derived from</h4>
+          <ul>
+            <li>Select a description of the source document or file used to create 
+              the finding aid.</li>
+            <li>Do not include punctuation at the end of the text.</li>
+          </ul>
+      <h4>Language (Finding Aid)</h4>
+          <blockquote> 
+            <h4>Code</h4>
+            <ul>
+              <li>Enter the language code for the most significant language(s) 
+                represented in the text of the finding aid. Use an <a href="http://lcweb.loc.gov/standards/iso639-2/">ISO 
+                639-2B</a> code to represent the language.</li>
+              <li>Do not include punctuation at the end of the text.</li>
+       
+            </ul>
+            <div style="margin-left: 2em"><i>Examples:</i> </div>
+            <div style="margin-left: 2em"> eng</div>
+            <h4>Script</h4>
+            <ul>
+              <li>Enter the code for the script of the language used to encode 
+                the finding aid. Use an <a href="http://www.unicode.org/iso15924/iso15924-codes.html">ISO 
+                15924</a> code to represent the script code.</li>
+              <li>Do not include punctuation at the end of the text.</li>
+            </ul>
+            <div style="margin-left: 2em"><i>Examples:</i> </div>
+            <div style="margin-left: 2em"> latn</div>
+            <h4>Language</h4>
+            <ul>
+              <li>Enter name of most significant language(s) represented in the 
+                text of the finding aid.</li>
+              <li>Do not include punctuation at the end of the text.</li>
+            </ul>
+            <div style="margin-left: 2em"><i>Example:</i> </div>
+            <div style="margin-left: 2em"> English</div>
+          </blockquote>
+          <h4>Descriptive Rules</h4>
+          <ul>
+            <li>Enter the title for the content standard used to prepare the collection 
+              or archival description.</li>
+            <li>Do not include punctuation at the end of the text.</li>
+          </ul>
+          <div style="margin-left: 2em"> 
+            <p><i>Example:</i><br />
+              Describing Archives: a Content Standard</p>
+          </div>
+          <hr /> <h2>Descriptive Summary</h2>
+      <hr />
+          <h4>Level of Description</h4>
+          <ul>
+            <li>Select the appropriate level of description.</li>
+          </ul>
+          <h4>Language (Collection Materials)</h4>
+          <blockquote> 
+            <h4>Code</h4>
+            <ul>
+              <li>Enter the language code for the most significant language(s) 
+                represented in the collection materials described by the finding 
+                aid. Use an <a href="http://lcweb.loc.gov/standards/iso639-2/">ISO 
+                639-2B</a> code to represent the language.</li>
+              <li>Do not include punctuation at the end of the text.</li>
+            </ul>
+            <div style="margin-left: 2em"><i>Examples:</i> </div>
+            <div style="margin-left: 2em"> eng</div>
+            <h4>Language</h4>
+            <ul>
+              <li>Enter name of most significant language(s) represented in the collection materials described by the finding 
+              aid.</li>
+              <li>Do not include punctuation at the end of the text.</li>
+            </ul>
+            <div style="margin-left: 2em"><i>Example:</i> </div>
+            <div style="margin-left: 2em"> English</div>
+          </blockquote>
+          <h4>Title of Collection</h4>
+      <blockquote> 
+        <h4>Proper Title</h4>
+        <ul>
+          <li>Enter the title of the collection using proper-title capitalization 
+            conventions. Do not include inclusive or bulk dates.</li>
+              <li>Form of title based on <strong>DACS Form</strong> title.</li>
+          <li>Do not include punctuation at the end of the text.</li>
+        </ul>
+        <div style="margin-left: 2em"><i>Examples (bolded to emphasize capitalization)</i><i>:</i> 
+
+        </div>
+        <div style="margin-left: 2em">Mitsuye Yamada <strong>Papers</strong><br />
+          Edward W. Cochems <strong>Photographs</strong><br />
+          Southern California Yachting Association <strong>Records</strong><br />
+          Central Records Unit <strong>Records</strong><br />
+          Mary Desti <strong>Collection</strong> on Isadora Duncan </div>
+            <h4>DACS Form</h4>
+            <ul>
+              <li>Enter the collection title without inclusive or bulk dates. 
+                Note that capitalization should follow AACR2 Appendix A rules.</li>
+              <li>Form of title determined from <a href="http://www.archivists.org/catalog/pubDetail.asp?objectID=1279">Describing 
+                Archives: a Content Standard</a>, Section 2.3.</li>
+              <li>Do not include punctuation at the end of the text.</li>
+            </ul>
+        <div style="margin-left: 2em"><i>Examples (bolded to emphasize capitalization)</i><i>:</i> 
+        </div>
+        <div style="margin-left: 2em">Mitsuye Yamada <strong>papers</strong> <br />
+          Edward W. Cochems <strong>photographs</strong><br />
+          Southern California Yachting Association <strong>records</strong><br />
+          Central Records Unit <strong>records</strong><br />
+
+          Mary Desti <strong>collection</strong> on Isadora Duncan</div>
+        <h4>Filing Title</h4>
+            <ul>
+              <li>Enter the <em>filing title</em> for the collection, per the 
+                <a href="/inside/diglib/guidelines/bpgead/bpgead_4a.html#d0e632">OAC 
+                BPG EAD</a> (see instructions for &lt;titleproper type=&quot;filing&quot;&gt;)</li>
+              <li>Do not include punctuation at the end of the text.</li>
+            </ul>
+        <div style="margin-left: 2em"><i>Examples (bolded to emphasize capitalization)</i><i>:</i> 
+        </div>
+        <div style="margin-left: 2em">Yamada (Mitsuye) <strong>Papers</strong> 
+          <br />
+          Cochems (Edward W.) <strong>Photographs</strong><br />
+          Southern California Yachting Association <strong>Records</strong><br />
+          Central Records Unit <strong>Records</strong><br />
+          Desti (Mary) <strong>Collection</strong> on Isadora Duncan</div>
+      </blockquote>
+          <h4>Dates 1-2<a name="dates"></a></h4>
+      <ul>
+        <li>Use <strong>Date 1</strong> to specify the primary date or date range 
+          of the collection. In general, it will either be a single date or inclusive 
+          dates. Use <strong>Date 2</strong> to specify bulk dates for collection 
+          items. </li>
+      </ul>
+      <blockquote> 
+        <h4>Type</h4>
+        <ul>
+          <li>Select type of date.</li>
+        </ul>
+            <h4>DACS Form</h4>
+            <ul>
+              <li>Enter dates of the collection. For bulk dates, include parentheses 
+                and the word "bulk".</li>
+              <li>Include punctuation at end of text.</li>
+            </ul>
+        <div style="margin-left: 2em"><i>Examples:</i></div>
+        <div style="margin-left: 2em">1942-1998<br />
+          (bulk 1950-1960)<br />
+          ca. 1919-1949<br />
+          ca. 1950<br />
+          1911-<br />
+          1789 Jan. 1</div>
+        <h4>Normalized ISO-8601 Form</h4>
+        <ul>
+              <li>Enter dates of the collection normalized according to ISO <a href="http://www.iso.org/iso/en/CatalogueDetailPage.CatalogueDetail?CSNUMBER=26780&ICS1=1&ICS2=140&ICS3=30">8601</a>, 
+                using a modified form of the W3C <em><a href="http://www.w3.org/TR/NOTE-datetime">Date 
+                and Time Formats</a></em> profile of this standard. The following 
+                format is recommended: YYYY-MM-DD, YYYY-MM, or YYYY (using 4 digits 
+                for years and hyphens between elements). For example, December 
+                12, 1904 would be normalized as &quot;1904-12-12&quot; and April 
+                1962 as &quot;1962-04.&quot; Use a forward slash (/) to separate 
+                dates in a range, and use the fullest form of the date at each 
+                end of the range. For example, normalize August 8-24, 1986 as 
+                1986-08-08/1986-08-24 and November 1923-March 1924 as 1923-11/1924-03.</li>
+        </ul>
+        <div style="margin-left: 2em"><i>Examples:</i><br />
+          1942/1998<br />
+          1914/1949 <br />
+          1945/1955<br />
+          1911/9999<br />
+          1789-01-01</div>
+      </blockquote>
+      <h4>Collection Number</h4>
+          <ul>
+            <li>Enter the collection number or a call number. If you do not assign 
+              collection numbers, enter &quot;Consult repository.&quot;</li>
+            <li>Do not include punctuation at the end of the text.</li>
+          </ul>
+      <div style="margin-left: 2em"><i>Example</i><i>s:</i> </div>
+      <div style="margin-left: 2em">MS-R34<br />
+
+        MSS-00004<br />
+        Consult repository</div>
+          <h4>Creator or Collector 1-2<a name="creator"></a></h4>
+          <ul>
+            <li>Use <strong>Creator or Collector 1 </strong>to specify the primary 
+              creator or collector of the collection. Use <strong>Creator or Collector 
+              2</strong> to specify an additional creator or collector. The form 
+              of the name(s) should be taken from an standard naming authority 
+              file, such as the <a href="http://authorities.loc.gov/">Library 
+              of Congress Name Authority File</a> or <a href="http://www.getty.edu/research/conducting_research/vocabularies/ulan/">Union 
+              List of Artists' Names</a>. If a name does not appear in an authority 
+              file, establish the name according to a content standard such as 
+              Describing Archives: a Content Standard, or more generally, AACR2.</li>
+            <li>Do not include punctuation at the end of the text.<br />
+              <br />
+              <i>Examples:</i><br />
+              <br />
+              <strong>Creator</strong><br />
+              Yamada, Mitsuye<br />
+              Cochems, Edward W. (Edward William), 1874-1949<br />
+              Southern California Yachting Association<br />
+              University of California, Irvine. Central Records Unit<br />
+              <br />
+              <strong>Collector</strong><br />
+              Desti, Mary </li>
+          </ul>
+
+
+        <blockquote> 
+          <h4>Heading</h4>
+          <ul>
+            <li>Select appropriate heading for the entry.</li>
+          </ul>
+          <h4>EAD Tag</h4>
+          <ul>
+
+            <li>Select appropriate EAD Tag for the creator or collector, using 
+              &quot;persname,&quot; &quot;corpname,&quot; or &quot;famname&quot; 
+              for personal names, corporate names, or family names (respectively).</li>
+          </ul>
+          <h4>Source</h4>  <ul>
+              <li>Select the standard naming authority file from which the name 
+                is taken: &quot;lcnaf&quot; for the Library of Congress Name Authority 
+                File, or &quot;ulan&quot; for the Union List of Artists' Names. 
+                If the heading does not appear in an authority file, select &quot;[none]&quot; 
+                and use the <strong>Rules</strong> pull-down window instead to 
+                indicate how the name is established.</li>
+            </ul>
+            <h4>Rules</h4>
+            <ul>
+              <li>Select the content standard by which the heading is established: 
+                &quot;aacr&quot; for AACR2 or &quot;dacs&quot; for Describing 
+                Archives: a Content Standard<em>.</em> Select &quot;[none]&quot; 
+                if you have already entered data using the <strong>Source</strong> 
+                pull-down window.</li>
+            </ul>
+        </blockquote>    <h4>Extent</h4>    <ul>
+            <li>Use <strong>Extent 1 </strong>to enter primary statement of collection 
+              extent. Optionally, use <strong>Extent 2 </strong>to indicate an 
+              additional statement of extent.</li>
+            <li>Include punctuation at the end of text.</li>
+          </ul>
+      <div style="margin-left: 2em"><i>Examples:</i></div>
+          <div style="margin-left: 2em"><strong>Extent</strong><br />
+        33.50 linear feet (71 archives boxes and 4 oversize folders).<br />
+        25 linear ft.<br />
+        71 archives boxes and 4 oversize folders.<br />
+        15 record cartons.</div>
+      <div style="margin-left: 2em"> 
+        <p><i>or (optional use of Extent 1 and 2)</i><i>:</i> </p>
+            <p><strong>Extent</strong><br />
+          33.50 linear feet </p>
+            <p><strong>Extent</strong><br />
+          (71 archives boxes and 4 oversize folders)</p>
+      </div>    
+          <h4>Extent (Digital Objects Only)</h4>
+          <ul>
+            <li>Enter a statement describing the total number of digital objects 
+              associated with the finding aid, if any.</li>
+            <li>Include punctuation at the end of text.</li>
+          </ul>
+          <div style="margin-left: 2em"><i>Examples:</i><br />
+            350 images<br />
+            250 texts and 25 maps</div>
+          <h4>Abstract</h4>
+      <ul>
+        <li>Enter a <em>concise</em> abstract describing the content of the collection.</li>
+        <li>Include punctuation at end of text.</li>
+      </ul>
+      <h4>Physical Location</h4>
+          <ul>
+            <li>Enter a statement indicating location of the collection, if applicable.&#160; 
+              This is required for University of California collections stored 
+              at regional storage facilities and is recommended for any collection 
+              not physically stored in the repository.</li>
+            <li>Include punctuation at end of text.</li>
+          </ul>
+      <div style="margin-left: 2em"><i>Example:</i></div>
+      <div style="margin-left: 2em"> Stored offsite at SRLF. Forty-eight hours 
+        advance notice is required for access to the papers. </div>
+      <hr /> <h2>Administrative Information</h2>
+      <hr /> <h4>Access</h4>
+          <ul>
+            <li>Enter a statement on access restrictions to the collection, if 
+              any, or indicate collection has no access restrictions.</li>
+            <li>Include punctuation at end of text.</li>
+          </ul>
+      <h4>Publication Rights</h4>
+          <ul>
+            <li>Enter a statement of conditions governing the use of the collection.</li>
+            <li>Include punctuation at end of text.</li>
+          </ul>
+      <h4>Acquisition Information</h4>
+          <ul>
+            <li>Enter a statement about the <i>immediate source of acquisition</i>of 
+              the collection.&#160; Information on other prior custodians of the 
+              collection, if relevant, should be entered separately using the 
+              &lt;<a href="http://www.loc.gov/ead/tglib/elements/custodhist.html">custodhist</a>&gt; 
+              Custodial History tag.</li>
+            <li>Include punctuation at end of text.</li>
+          </ul>
+      <h4>Biography / Administrative History</h4>
+          <ul>
+            <li>Enter a concise essay that places the materials in context by 
+              providing information about the creator(s) or collector(s).</li>
+            <li>Include punctuation at end of text.</li>
+          </ul>
+      <h4>Chronology</h4>
+      <ul>
+        <li>Optionally, enter a concise chronological list of dates and events 
+          that places the materials in context by providing information about 
+          the creator(s) or collector(s).</li>
+            <li>Use either the <strong>Automated input </strong>or <strong>Manual 
+              input </strong> fields to encode a chronology. </li>
+      </ul>
+      <blockquote> 
+            <p><strong>Automated input</strong></p>
+        <ul>
+          <li>This field is designed to automatically encode tab-delineated chronological 
+            lists, which can be cut and pasted into the field from non-EAD finding 
+            aids. Lists must be formatted so that dates are followed by the event. 
+            Separate dates and events with tab breaks or at least three blank 
+            spaces. Each entry in the list should end with a tab break, line-break, 
+            or return key.</li>
+          <li><em>When using this field, always check and validate your encoding 
+            to ensure accuracy. The automated encoding may produce errors if the 
+            tab-delineated list is not formatted properly.</em></li>
+          <li>An introductory statement can also be included within this field.</li>
+        </ul>
+        <div style="margin-left: 2em"><em>Example:</em></div>
+         <div style="margin-left: 2em">1995&lt;tab&gt;Published Mal d'archive.&lt;tab&gt; <br />
+
+          1996&lt;tab&gt;Participated in a symposium to celebrate the opening 
+          of the Critical Theory Archive at the UCI.&lt;tab&gt;<br />
+          <br />
+          -or- <br />
+          <br />
+          1995&lt;space&gt;&lt;space&gt;&lt;space&gt;Published Mal d'archive.&lt;return&gt; 
+          <br />
+          1996&lt;space&gt;&lt;space&gt;&lt;space&gt;Participated in a symposium 
+          to celebrate the opening of the Critical Theory Archive at the UCI.&lt;return&gt; 
+          <br />
+          <em>[etc.]</em></div>
+
+
+            <p><strong>Manual input</strong></p>
+        <ul>
+              <li>This field is designed for manual encoding of chronological 
+                lists. List (in order) the date or date range for an event, followed 
+                by a description the event. Encode the date or date range in 
+                &lt;<a href="http://www.loc.gov/ead/tglib/elements/date.html">date</a>&gt;; encode the event in &lt;<a href="http://www.loc.gov/ead/tglib/elements/event.html">event</a>&gt;.</li>
+          <li>An introductory statement can also be included within this field. 
+          </li>
+        </ul>
+        <div style="margin-left: 2em"><em>Example:</em> </div>
+        <div style="margin-left: 2em">&lt;chronitem&gt;&lt;date&gt;1982&lt;/date&gt;<br />
+          &lt;event&gt;Published &lt;emph render=&quot;italic&quot;&gt;L'Oreille 
+          de l'autre&lt;/emph&gt;.&lt;/event&gt;<br />
+          &lt;/chronitem&gt;<br />
+          <br />
+          &lt;chronitem&gt;&lt;date&gt;1982&lt;/date&gt;<br />
+          &lt;event&gt;Appeared in the Ken McMullen film &lt;emph render=&quot;italic&quot;&gt;Ghost 
+          Dance&lt;/emph&gt;.&lt;/event&gt;<br />
+          &lt;/chronitem&gt;<br />
+          <br />
+          &lt;chronitem&gt;<br />
+          &lt;date&gt;1983&lt;/date&gt;<br />
+          &lt;event&gt;Helped found the Coll&amp;egrave;ge international de Philosophie 
+          and served as its first president.&lt;/event&gt;<br />
+          &lt;/chronitem&gt;<br />
+          <em>[etc.]</em><br />
+        </div>
+      </blockquote>
+      <h4>Scope and Content of Collection</h4>
+          <ul>
+            <li>Enter a concise essay summarizing the document types, formats, 
+              and topical coverage of the collection.</li>
+            <li>Include punctuation at end of text.</li>
+          </ul>
+      <h4>Arrangement</h4>
+          <ul>
+            <li>Optionally, enter a statement summarizing how the materials have 
+              been organized or ordered.</li>
+            <li>Include punctuation at end of text.</li>
+          </ul>
+      <h4>Indexing Terms</h4>
+          <ul>
+            <li>Enter a list of controlled index terms for the most important 
+              names, topics, form/genres, occupations, and other concepts (i.e., 
+              subjects) represented in the collection, or the names of contributors 
+              to or co-creators (i.e., added entries) of the collection.</li>
+            <li class="feedback">The OAC recommends application of at least three 
+              subject heading in order to promote maximum topical access to your 
+              collection via the OAC interface.</li>
+            <li>Use either the <strong>Manual-Input</strong> or <strong>MARC-Input</strong> 
+              field to encode controlled index terms. 
+              <blockquote> 
+                <p><strong>Personal, Family, and Corporate Names; Geographical 
+                  Names </strong></p>
+              </blockquote>
+              <ul>
+                <li>The form of the name(s) should be taken from an standard naming 
+                  authority file, such as the <a href="http://authorities.loc.gov/">Library 
+                  of Congress Name Authority File</a> or <a href="http://www.getty.edu/research/conducting_research/vocabularies/ulan/">Union 
+                  List of Artists' Names</a>. If a name does not appear in an 
+                  authority file, establish the name according to a content standard 
+                  such as DACS, or more generally, AACR2.</li>
+              </ul>
+              <blockquote> 
+                <p><strong>Subjects or Topical Terms</strong></p>
+              </blockquote>
+              <ul>
+                <li>The form of the heading should be taken from a standard thesaurus, 
+                  such as the <a href="http://authorities.loc.gov/">Library of 
+                  Congress Subject Headings</a> (LCSH), <a href="http://www.getty.edu/research/conducting_research/vocabularies/aat/">Art 
+                  and Architecture Thesaurus</a> (AAT), or <a href="http://www.loc.gov/rr/print/tgm1/">Thesaurus 
+                  of Graphic Materials I</a> (TGM). While the OAC does not prescribe 
+                  that topical values be drawn from a specific thesaurus, it strongly 
+                  prefers that repositories use LCSH. 
+                  <p>If a heading does not appear in a thesaurus, establish the 
+                    heading according to standard thesaurus rules (such as the 
+                    Library of Congress' <em>Subject Cataloging Manual</em>, AAT 
+                    rules, or TGM rules), or according to local rules.</p>
+                </li>
+              </ul>
+              <blockquote> 
+                <p><strong>Titles</strong></p>
+              </blockquote>
+              <ul>
+                <li>Use for formal titles of works which are contained or represented 
+                  in a collection, or for titles of projects and/or (meta)collections 
+                  of which the collection is a member. A &quot;metacollection&quot; 
+                  is an artificial collection of two or more discrete collections. 
+                  <p>The form of the title should be taken from an standard naming 
+                    authority file, such as the <a href="http://authorities.loc.gov">Library 
+                    of Congress Title Authority File</a>. If a title does not 
+                    appear in an authority file, establish the title according 
+                    to a content standard such as DACS, or more generally, AACR2. 
+                    <br />
+                  </p>
+                </li>
+              </ul>
+              <blockquote> 
+                <p><strong>Form/Genre, Occupations, and Function Terms</strong></p>
+              </blockquote>
+              <ul>
+                <li>The form of the heading should be taken from a standard thesaurus, 
+                  such as the <a href="http://authorities.loc.gov/">Library of 
+                  Congress Subject Headings</a> (LCSH), <a href="http://www.getty.edu/research/conducting_research/vocabularies/aat/">Art 
+                  and Architecture Thesaurus</a> (AAT), or <a href="http://www.loc.gov/rr/print/tgm2/">Thesaurus 
+                  of Graphic Materials II</a> (TGM). While the OAC does not prescribe 
+                  that topical values be drawn from a specific thesaurus, it strongly 
+                  prefers that repositories use LCSH. 
+                  <p>If a heading does not appear in a thesaurus, establish the 
+                    heading according to standard thesaurus rules (such as the 
+                    Library of Congress' <em>Subject Cataloging Manual</em>, AAT 
+                    rules, or TGM rules), or according to local rules.</p>
+                </li>
+              </ul>
+            </li>
+          </ul>
+      <blockquote> 
+        <h4><strong>Manual Input</strong></h4>
+            <ul>
+              <li>These fields are designed for manually inputted indexing terms. 
+                <ul>
+                  <li><strong>Tag:</strong> Select appropriate EAD tag based on 
+                    the type of indexing term: 
+                    <ul>
+                      <li>Corpname: Corporate names</li>
+                      <li>Famname: Family names</li>
+                      <li>Function: Function terms</li>
+                      <li>Genreform: Form/genre terms</li>
+                      <li>Geogname: Geographical names</li>
+                      <li>Occupation: Occupation terms</li>
+                      <li>Persname: Personal names</li>
+                      <li>Subject: Subjects or topical terms</li>
+                      <li>Title: Titles</li>
+                    </ul>
+                  </li>
+                  <li><strong>Role=&quot;subject&quot;</strong>: If the indexing 
+                    term is being used as a subject (i.e., not as a co-creator 
+                    or contributor, such as in the case of personal, family, or 
+                    corporate names), then click on the checkbox.</li>
+                  <li><strong>Source</strong>: Select the standard naming authority 
+                    file from which the heading is taken, using the code from 
+                    the Library of Congress' <a href="http://www.loc.gov/marc/relators/relasour.html">Term, 
+                    Name, and Title Sources Code List</a>. If the appropriate 
+                    code cannot be found in the pull-down window, enter it into 
+                    the <strong>Other source</strong> field. If the heading does 
+                    not appear in an authority file, use the <strong>Rules</strong> 
+                    pull-down window instead to indicate how the name is established.</li>
+                  <li><strong>Rules</strong>: Select the content standard or thesaurus 
+                    rules by which the heading is established, using the appropriate 
+                    code for from the Library of Congress' <a href="http://www.loc.gov/marc/relators/reladesc.html">Descriptive 
+                    Conventions Code List</a> or <a href="http://www.loc.gov/marc/relators/relasour.html">Term, 
+                    Name, and Title Sources Code List</a>. If a content standard 
+                    or thesaurus rules are not used, use &quot;local&quot;. If 
+                    the appropriate code cannot be found in the pull-down window, 
+                    enter it into the <strong>Other rules</strong> field. Do not 
+                    enter data into this section if you have already entered data 
+                    using the <strong>Rules</strong> pull-down window.</li>
+                  <li>Enter the indexing term for the collection. If term is subdivided, 
+                    use double-hyphen (&quot;--&quot;) to express subdivision. 
+                    <p><em>Examples of indexing term field entry:</em><br />
+                      Agriculture.<br />
+                      Contra Costa County (Calif.)--Sources.<br />
+                      Japanese Americans--Evacuation and relocation, 1942-1945--Photographs.</p>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+        <h4><strong>MARC-Input</strong></h4>
+        <ul>
+          <li>This field is designed to encode MARC formatted data copied and 
+            pasted from an existing cataloging record: 
+            <ul>
+              <li>Copy and paste all MARC 6xx and 7xx fields (including indicators, 
+                source subfields, source codes, and other MARC formatting data) 
+                directly into this field.</li>
+            </ul>
+          </li>
+        </ul>
+      </blockquote>
+      <p>&nbsp;</p>
+	  <a name="4"></a>
+          <h2>4. High Level Description Form: Optional Fields</h2>
+      <p> Use these fields to enter data specified as optional by the OAC BPG 
+        EAD. Completed fields will be inserted by the template into the appropriate 
+        section of the EAD file, as permitted by the EAD DTD. Note that the template 
+        will not produce encoding for these fields if left blank.</p>
+      <p>The following fields require additional instructions:</p>
+      <h4>Bibliography</h4>
+      <ul>
+            <li>Encode each bibliographic citation within a &lt;<a href="http://www.loc.gov/ead/tglib/elements/bibref.html">bibref</a>&gt;</font> 
+              tag. Encode titles of works within &lt;<a href="http://www.loc.gov/ead/tglib/elements/title.html">title</a>&gt;. 
+              Use other tags within &lt;bibref&gt; as necessary and as allowed 
+              per the EAD TL.</li>
+        <li>An introductory statement can also be included within this field.</li>
+      </ul>
+      <div style="margin-left: 2em"><i>Example:</i> </div>
+      <div style="margin-left: 2em"> &lt;bibref&gt;Armor, Samuel. &lt;title&gt;History 
+        of Orange County, California&lt;/title&gt; (Los Angeles: Historic Record 
+        Co., 1911).&lt;/bibref&gt; 
+        <p>&lt;bibref&gt;Armor, Samuel. &lt;title&gt;History of Orange County, 
+          California&lt;/title&gt;, 2nd ed. (Los Angeles: Historic Record Co., 
+          1921).&lt;/bibref&gt;</p>
+        <p>&lt;bibref&gt;McPherson, William. &quot;Joseph Edward Pleasants, '49er,&quot; 
+          &lt;title&gt;Orange County History Series&lt;/title&gt; 3 (1939): 41-50.&lt;/bibref&gt;<br />
+          <em>[etc.]</em></p>
+      </div>
+      <h4>Index</h4>
+      <ul>
+            <li>Encode each index term within an &lt;<a href="http://www.loc.gov/ead/tglib/elements/indexentry.html">indexentry</a>&gt; 
+              tag. Use other tags within &lt;indexentry&gt; as necessary and as 
+              allowed per the EAD TL.</li>
+        <li>An introductory statement can also be included within this field.</li>
+      </ul>
+      <div style="margin-left: 2em"><i>Example:</i> </div>
+      <div style="margin-left: 2em"> &lt;indexentry&gt;&lt;persname&gt;Aaron, 
+        Daniel&lt;/persname&gt;&lt;/indexentry&gt;<br />
+        &lt;indexentry&gt;&lt;persname&gt;Abrams, M. H. &lt;/persname&gt;&lt;/indexentry&gt;<br />
+        &lt;indexentry&gt;&lt;persname&gt;Adams, David&lt;/persname&gt;&lt;/indexentry&gt;<br />
+        &lt;indexentry&gt;&lt;persname&gt;Adams, Hazard&lt;/persname&gt;&lt;/indexentry&gt;<br />
+        <em>[etc.]</em></div>
+
+
+<!-- END DOCUMENT BODY -->
+
+
+</div>
+        <div class="metadata">
+<!-- BEGIN METADATA2 -->
+<p><em>Document owner:</em> <strong>CDL Digital Special Collections (oacops @ cdlib . org) </strong></p>
+<p><em>Last reviewed:</em> March 2008</p>
+<!-- END METADATA2 -->
+	<p><em>URL:</em> http://<!--#echo var="HTTP_HOST" var="DOCUMENT_URI" --><br /><br /></p>
+	</div>
+	</div>
+<!-- BEGIN CONTACT THE CDL -->
+<div class="contact-box"><span class="contact-box-header">CDL Digital Special Collections Helpdesk</span>
+  <ul>
+    <li><em>Need assistance? Contact us via e-mail: </em><strong>oacops @ cdlib . org</strong></li>
+  </ul>
+</div>
+<!-- END CONTACT THE CDL -->
+	</div>
+	</div>
+	<div class="footer"><!--#include virtual="/includes/insidecdl-copyright.html" --></div>
+	</div>
+	</body>
+	</html>

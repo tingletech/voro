@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<!-- BEGIN METADATA -->
+<title>Inside CDL: OAC EAD Web Template Request Form</title>
+<meta name="description" content="" /><!-- END METADATA -->
+<!--#include virtual="/includes/insidecdl-styles.html" -->
+<style type="text/css">
+/*<![CDATA[*/
+li.c2 {list-style: none}
+span.c1 {font-size: 80%}
+/*]]>*/
+</style>
+</head>
+<body>
+<div class="box-wrap">
+<div class="header"><!--#include virtual="/includes/insidecdl-header.html" --></div>
+<div class="columns-float">
+<div class="column-one"><div class="column-one-content">
+<!--#include virtual="/includes/insidecdl-left.html" -->
+<!--#include virtual="/includes/insidecdl-left-oac.html" -->
+
+<!-- SEE ALSO --></div></div>
+<div class="column-two">
+<div class="column-two-content"><!--#exec cmd="perl /cdldir/scripts/breadcrumb.pl"-->
+<div class="doc-body"><!-- BEGIN DOCUMENT BODY -->
+<h1>OAC EAD Web Template Request Form</h1>
+
+<h2>Thank you for your submission!  An OAC Operations Group staff member will contact you shortly.</h2>
+
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+
+<!-- END DOCUMENT BODY -->
+<br />
+<br />
+</div>
+        <div class="metadata">
+          <!-- BEGIN METADATA2 -->
+          <p><em>Document Owner:</em> <a href="http://www.cdlib.org/inside/projects/oac/help/help_affiliates.html">OAC 
+            Operations Group</a></p>
+          <p><em>Last reviewed:</em> October 13, 2003</p>
+<!-- END METADATA2 -->
+<p><em>URL:</em> http://<!--#echo var="HTTP_HOST" var="DOCUMENT_URI" --></p>
+</div>
+</div>
+
+<!-- BEGIN RELATED INFORMATION -->
+<div class="related-info-box">
+<a name="related_info"></a>
+<span class="related-info-box-header">Related Information</span>
+<ul>
+<li><a href="/inside/projects/oac/">Especially for Contributing Members</a></li>
+          <li><a href="/inside/projects/oac/dig/">Digital Objects: Selected Resources</a></li>
+</ul>
+</div>
+<!-- END RELATED INFORMATION -->
+
+</div>
+</div>
+<div class="footer"><!--#include virtual="/includes/insidecdl-copyright-oac.html" --></div>
+</div>
+</body>
+</html>
