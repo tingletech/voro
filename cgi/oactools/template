@@ -779,9 +779,9 @@ sub ParseUrl {
 	$SystemVariables{_SCRIPT_URL}    = "http://$server$script";
 	$SystemVariables{_PATH_INFO}     = $pathinfo;
 	$SystemVariables{_TEMPLATE_FILE} = $template_name;
-	$SystemVariables{_FULL_URL}      = "http://$server$script$pathinfo";
+	$SystemVariables{_FULL_URL}      = "$script$pathinfo";
 	$pathinfo =~ s/@.*//;
-	$SystemVariables{_URL}           = "http://$server$script$pathinfo";
+	$SystemVariables{_URL}           = "$script$pathinfo";
 	if ($template_call) {
 		$SystemVariables{_TEMPLATE_NAME} = $template_call;
 	} else {
