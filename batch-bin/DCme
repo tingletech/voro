@@ -5,6 +5,7 @@ use XML::LibXML;
 my $parser = XML::LibXML->new();
 use XML::LibXML::XPathContext;
 use File::Path;
+use File::stat;
 
 my $buildfile = "$ENV{HOME}/workspace/DC/build-dc.xml";
 
@@ -23,6 +24,8 @@ open (BUILD, ">$buildfile");
 
 my $now = localtime;
 # start printing the XML file
+
+$| = 1;
 
 print BUILD <<EOF;
 
@@ -107,11 +110,20 @@ sub upfile {
 	my $out = $_;
 	$out =~ s,/(.*)\.mets\.xml$,/$1.dc.xml,;
 	die ("same name for in and out") if ($_ eq $out);
+	my $METSstat = stat("$_");
+	my $DCstat = stat("$out");
 	# check that the files exist
-	if ( -e "$mets_base/$dcx" && $dcx){
-		print BUILD qq{<xslt in="$_" out="$out" style="\${metsBase}/$dcx"><classpath location="\${saxon}"/><factory name="net.sf.saxon.TransformerFactoryImpl"/></xslt>\n } 
-	} else {
-		#print STDERR "$profile what what what $0: $! $_ $mets_base/$dcx\n";
+	if ( -e "$mets_base/$dcx" && $dcx ){
+		my $dcxStat = stat("$mets_base/$dcx");
+		if ( 	not(-e $out) ||				# if the .dc.xml is not there yet OR
+			( $METSstat->mtime > $DCstat->mtime  	# METS file is newer than DC file
+			|| $dcxStat->mtime > $DCstat->mtime ) 	# OR XSLT is newer than the DC file
+		   )
+			{
+			print BUILD qq{<xslt in="$_" out="$out" style="\${metsBase}/$dcx"><classpath location="\${saxon}"/><factory name="net.sf.saxon.TransformerFactoryImpl"/></xslt>\n } ;
+		} else {
+			#print STDERR "$profile what what what $0: $! $_ $mets_base/$dcx\n";
+		}
 	}
   }
 }
