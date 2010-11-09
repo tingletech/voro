@@ -19,7 +19,7 @@
 #
 #			if this parameter is the string consisting of a
 #			single hyphen ("-"), then this script will scan
-#			directory "/voro/ingest/data", for files with names
+#			directory "/dsc/data/ingest-stats/data", for files with names
 #			of the form "object_list.YYYYMMDD.txt", and will use
 #			the one with the more recent "YYYYMMDD" date.
 #
@@ -27,19 +27,19 @@
 #			written this run's current information about all
 #			EAD and METS objects.  the default (if this parameter
 #			is omitted or is of length zero) is
-#			"/voro/ingest/data/object_list.YYYYMMDD.txt", where
+#			"/dsc/data/ingest-stats/data/object_list.YYYYMMDD.txt", where
 #			"YYYYMMDD" is today's date.  (this file should be
 #			input to the subsequent run of this script.)
 #
 #		3 - optional - the directory in which the EAD and METS objects
 #			reside.  the default (if this parameter is omitted
-#			or is of length zero) is "/voro/XTF/data"
+#			or is of length zero) is "/dsc/data/xtf/data"
 #
 #		4 - optional - the name of the output file to which is
 #			appended the information about the new and updated
 #			EAD and METS objects, that was found during this run.
 #			the default (if this parameter is omitted or of length
-#			zero) is "/voro/ingest/data/ingest_stats.txt".  (it
+#			zero) is "/dsc/data/ingest-stats/data/ingest_stats.txt".  (it
 #			is always opened for "append".)
 #
 # File formats:
@@ -106,7 +106,7 @@
 #
 # Object type:	The object type is determined by looking in the directory
 #		for the object.  (The directory will typically be
-#		"/voro/XTF/data/*/XX/ARKNUMBER".)  If a file by the name
+#		"/dsc/data/xtf/data/*/XX/ARKNUMBER".)  If a file by the name
 #		"ARKNUMBER.xml" is present, and it contains "<ead>" XML,
 #		the object type is EAD, and "ARKNUMBER.xml" is the file to
 #		"watch".  Otherwise, the type is "METS", and the file to
@@ -120,6 +120,7 @@
 #			list files are not the same.
 #		2009/6/9 - MAR - Don't do the above check if we don't have
 #			an input file.
+#       2010/10/27 - MER - Change to work in consolidated dsc server environment
 #
 # ------------------------------------
 
@@ -164,9 +165,9 @@ if ((scalar(@ARGV) >= 1) && (length($ARGV[0]) > 0)) {
 
 	# If we have been requested to select the input file, do so now.
 	if ($input_info_file eq "-") {
-		opendir(DIR, "/voro/ingest/data") ||
+		opendir(DIR, "/dsc/data/ingest-stats/data") ||
 			die "$c:  unable to open directory ",
-				"\"/voro/ingest/data\", $!, stopped";
+				"\"/dsc/data/ingest-stats/data\", $!, stopped";
 		my @input_dir_contents = ( );
 		while (defined($_ = readdir(DIR))) {
 			next unless (/^object_list\.\d{8}\.txt$/);
@@ -176,12 +177,12 @@ if ((scalar(@ARGV) >= 1) && (length($ARGV[0]) > 0)) {
 		if (scalar(@input_dir_contents) == 0) {
 			die "$c:  first parameter was a hyphen, but there ",
 				"were no potential input files in ",
-				"\"/voro/ingest/data\", stopped";
+				"\"/dsc/data/ingest-stats/data\", stopped";
 			}
 		@input_dir_contents = sort(@input_dir_contents);
 
 		# Select the one with the largest YYYYMMDD.
-		$input_info_file = "/voro/ingest/data/" .
+		$input_info_file = "/dsc/data/ingest-stats/data/" .
 			$input_dir_contents[$#input_dir_contents];
 		print "$c:  selected \"$input_info_file\" as the input file\n";
 		}
@@ -196,7 +197,7 @@ if ((scalar(@ARGV) >= 2) && (length($ARGV[1]) > 0)) {
 else {
 	# Build the name of the output file.
 	@now = localtime( );
-	$output_info_file = "/voro/ingest/data/object_list." .
+	$output_info_file = "/dsc/data/ingest-stats/data/object_list." .
 		sprintf("%04d%02d%02d", $now[5] + 1900, $now[4] + 1, $now[3]) .
 		".txt";
 	undef @now;
@@ -206,14 +207,14 @@ if ((scalar(@ARGV) >= 3) && (length($ARGV[2]) > 0)) {
 	$object_dir = $ARGV[2];
 	}
 else {
-	$object_dir = "/voro/XTF/data";
+	$object_dir = "/dsc/data/xtf/data";
 	}
 
 if ((scalar(@ARGV) >= 4) && (length($ARGV[3]) > 0)) {
 	$new_and_updated_file = $ARGV[3];
 	}
 else {
-	$new_and_updated_file = "/voro/ingest/data/ingest_stats.txt";
+	$new_and_updated_file = "/dsc/data/ingest-stats/data/ingest_stats.txt";
 	}
 
 if (scalar(@ARGV) > 4) {

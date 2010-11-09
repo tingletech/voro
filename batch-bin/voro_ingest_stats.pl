@@ -26,12 +26,12 @@
 #
 #		3 - optional - the e-mail address to which to send any
 #			failures.  if this parameter is omitted or of length
-#			zero, send them to the "voro" account on this machine.
+#			zero, send them to the "dsc" account on this machine.
 #
 #		4 - optional - the directory into which to write the execution
 #			logs (i.e., the STDERR and STDOUT output) of the two
 #			commands.  if this parameter is omitted or of length
-#			zero, the directory is "/voro/ingest/logs".
+#			zero, the directory is "/dsc/data/ingest-stats/logs".
 #
 # Author:	Michael A. Russell
 #
@@ -39,6 +39,7 @@
 #		2009/5/27 - MAR - Initial writing
 #		2009/6/16 - MAR - Change the message if the commands we run
 #			don't generate any output.
+#       2010/10/27 - MER - Change to work in consolidated dsc server environment
 #
 # ------------------------------------
 
@@ -112,21 +113,21 @@ if ((scalar(@ARGV) >= 3) && (length($ARGV[2]) > 0)) {
 	$e_mail_addr = $ARGV[2];
 	}
 else {
-	$e_mail_addr = "voro";
+	$e_mail_addr = "dsc";
 	}
 
 if ((scalar(@ARGV) >= 3) && (length($ARGV[2]) > 0)) {
 	$e_mail_addr = $ARGV[2];
 	}
 else {
-	$e_mail_addr = "voro";
+	$e_mail_addr = "dsc";
 	}
 
 if ((scalar(@ARGV) >= 4) && (length($ARGV[3]) > 0)) {
 	$log_dir = $ARGV[3];
 	}
 else {
-	$log_dir = "/voro/ingest/logs";
+	$log_dir = "/dsc/data/ingest-stats/logs";
 	}
 
 # Create the timestamp for the log file(s) for this run.

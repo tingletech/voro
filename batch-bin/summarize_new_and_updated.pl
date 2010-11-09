@@ -13,7 +13,7 @@
 #		1 - optional - the file containing the detail information
 #			about new and updated EAD and METS objects.  the
 #			default (if this parameter is omitted or of length
-#			zero) is "/voro/ingest/data/ingest_stats.txt".
+#			zero) is "/dsc/data/ingest-stats/data/ingest_stats.txt".
 #
 #		2 - optional - date for which to do the summarization.
 #			the default (if this parameter is omitted or of length
@@ -24,7 +24,7 @@
 #		3 - optional - the directory into which to write the HTML
 #			summary files.  the default (if this parameter is
 #			omitted or of length zero) is a subdirectory of
-#			"/voro/ingest/html" by the name "yyyymmdd" where that
+#			"/dsc/data/ingest-stats/html" by the name "yyyymmdd" where that
 #			is the date for the summarization (as specified by the
 #			second command line parameter).
 #	TODO
@@ -47,7 +47,7 @@
 #
 #		6 - optional - the path to the finding aids.  the default
 #			(if this parameter is omitted or of length zero) is
-#			"/voro/data/oac-ead/prime2002".
+#			"/dsc/data/in/oac-ead/prime2002".
 #
 # Author:	Michael A. Russell
 #
@@ -74,6 +74,7 @@
 #
 #  --> 		2010/05/07 bct digital extent stats
 #
+#       2010/10/27 - MER - Change to work in consolidated dsc server environment
 # ------------------------------------
 
 use strict;
@@ -135,7 +136,7 @@ if ((scalar(@ARGV) >= 1) && (length($ARGV[0]) > 0)) {
 	$detail_file = $ARGV[0];
 	}
 else {
-	$detail_file = "/voro/ingest/data/ingest_stats.txt";
+	$detail_file = "/dsc/data/ingest-stats/data/ingest_stats.txt";
 	}
 
 if ((scalar(@ARGV) >= 2) && (length($ARGV[1]) > 0)) {
@@ -189,7 +190,7 @@ if ((scalar(@ARGV) >= 3) && (length($ARGV[2]) > 0)) {
 	$output_dir = $ARGV[2];
 	}
 else {
-	$output_dir = "/voro/ingest/html/" . sprintf("%04d%02d%02d",
+	$output_dir = "/dsc/data/ingest-stats/html/" . sprintf("%04d%02d%02d",
 		$summarization_date[0], $summarization_date[1],
 		$summarization_date[2]);
 	}
@@ -212,7 +213,7 @@ if ((scalar(@ARGV) >= 6) && (length($ARGV[5]) > 0)) {
 	$ead_dir = $ARGV[5];
 	}
 else {
-	$ead_dir = "/voro/data/oac-ead/prime2002";
+	$ead_dir = "/dsc/data/in/oac-ead/prime2002";
 	}
 
 if (scalar(@ARGV) > 6) {
