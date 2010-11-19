@@ -54,11 +54,14 @@ use vars qw(
 	$command_one_short
 	@command_out
 	$command_two
+	$command_two_param
 	$command_two_short
 	$e_mail_addr
 	$exit_code
 	$log_dir
 	$log_timestamp
+    $ingest_stats_data_file
+    $current_date
 	$output_is
 	$nearby
 	@now
@@ -134,6 +137,8 @@ else {
 @now = localtime( );
 $log_timestamp = sprintf("%04d%02d%02d.%02d%02d%02d.$$", $now[5] + 1900,
 	$now[4] + 1, $now[3], $now[2], $now[1], $now[0]);
+$current_date = sprintf("%04d/%02d/%02d", $now[5] + 1900,
+	$now[4] + 1, $now[3]);
 
 # If the log directory doesn't exist, we cannot proceed, and we'll go ahead
 # and put something on STDERR.
@@ -206,6 +211,12 @@ else {
 	}
 
 # Execute command two, and log its output, if it generated any.
+$ingest_stats_data_file = '/dsc/data/ingest-stats/data/ingest_stats.txt';
+$command_two_param = $ingest_stats_data_file." ".$current_date;
+if (length($command_two_param) > 0) {
+	$command_two .= " $command_two_param";
+	}
+
 @command_out = `$command_two 2>&1`;
 $exit_code = $? >> 8;
 if (scalar(@command_out) > 0) {

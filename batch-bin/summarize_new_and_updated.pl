@@ -153,11 +153,11 @@ if ((scalar(@ARGV) >= 2) && (length($ARGV[1]) > 0)) {
 	@the_date = localtime($i);
 
 	# Check that it was Friday.
-	unless ($the_date[6] == 5) {
-		die "$c:  ", sprintf("%04d/%02d/%02d", $the_date[5] + 1900,
-			$the_date[4] + 1, $the_date[3]), " was not a ",
-			"Friday, stopped";
-		}
+    #unless ($the_date[6] == 5) {
+    #	die "$c:  ", sprintf("%04d/%02d/%02d", $the_date[5] + 1900,
+    #		$the_date[4] + 1, $the_date[3]), " was not a ",
+    #		"Friday, stopped";
+    #	}
 
 	# Use that date.
 	@summarization_date = ($the_date[5] + 1900, $the_date[4] + 1,
