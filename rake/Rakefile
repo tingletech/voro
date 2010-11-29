@@ -72,6 +72,7 @@ end
 # This replaces rsync.sh and RSYNCDATA
 namespace :sync do
 	# temporary / phase 1 deploy where voroEAD still runs on voro
+        desc "pull files from production TEMPORARY"
 	task :pullfromproduction do |t|
 		production = "voro@voro.cdlib.org"
 		cvs_opts = "-v --cvs-exclude --links --recursive --times"
