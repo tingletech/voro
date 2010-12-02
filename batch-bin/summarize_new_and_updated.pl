@@ -457,15 +457,14 @@ foreach $new_or_updated ("new", "updated") {
 						"findaid/$_";
 
 					# Staging URL for EAD.
-					$stage_url = "http://oac-stage.cdlib." .
-						"org/findaid/$_";
+					$stage_url = "http://$ENV{'FINDAID_HOSTNAME'}/findaid/$_";
 					}
 				else {
 					# URL for METS.
 					$url = "http://content.cdlib.org/$_";
 
 					# Staging URL for METS.
-					$stage_url = "http://voro.cdlib.org/$_";
+					$stage_url = "http://$ENV{'CONTENT_HOSTNAME'}/$_";
 
 					# No asterisk for a METS file.
 					$has_dao_or_daogrp = "&nbsp;";
