@@ -1,0 +1,70 @@
+#!/bin/env perl
+##=================================================================##
+## Filename:    oac                                                ##
+## Author:      Alvin Pollock (apollock@library.berkeley.edu)      ##
+## Version:     2.1                                                ##
+## Date:       2003/10/14 bct
+## Description: Persistent URL resolver.                           ##
+##                                                                 ##
+## Copyright (c) 1998 The Regents of the University of California. ##
+## All rights reserved.                                            ##
+##=================================================================##
+
+## Set here the location of the PURL table
+$PurlTable = "./ark.dat";
+
+$UserAgent   = $ENV{'HTTP_USER_AGENT'};
+$PathInfo    = $ENV{'PATH_INFO'};
+$PathInfo =~ s,/$,,;
+$PathInfo =~ s,/ead/,/,;
+$PathInfo =~ s,/\@.*,,;
+
+$QueryString = $ENV{'QUERY_STRING'};
+&BuildTable;
+&Resolve;
+
+sub Resolve {
+	if ($Table->{'Pathinfo Table'}->{$PathInfo}) {
+		&Redirect ($Table->{'Pathinfo Table'}->{$PathInfo});
+	} elsif ($Table->{'dynamoves'}->{$PathInfo}) {
+		my $truepath = $Table->{'dynamoves'}->{$PathInfo};
+		&Redirect ($Table->{'Pathinfo Table'}->{$truepath});
+	} else {
+		print "Location: http://www.oac.cdlib.org/\n\n";
+	}
+}
+
+sub Redirect {
+	my ($repos, $ead) = @_;
+	my $url       = $Table->{'Redirect Parameters'}->{BaseURL};
+	my $default   = $Table->{'Redirect Parameters'}->{DefaultPath};
+	my $nodefault = $Table->{'Redirect Parameters'}->{NoDefault};
+	if ($repos) {
+		print "Location: $url$repos$ead\n\n";
+	} else {
+		if ($PathInfo =~ /^($nodefault)/) {
+			print "Location: $url$PathInfo\n\n";
+		} else {
+			print "Location: $url$default$PathInfo\n\n";
+		}
+	}
+}
+
+
+sub BuildTable {
+	open (PURLTABLE, "$PurlTable") || die "Couldn't open PURL table $PurlTable: $!\n";
+	my $current;
+	while (my $line = <PURLTABLE>) {
+		next if $line =~ /^\s*$/;
+		next if $line =~ /^\s*#/;
+		if ($line =~ /^\s*\[([^\]]+)\]/) {
+			$current = $1;
+		} elsif ($current && ($line =~ /^\s*([^\s]+)\s+(.*)$/)) {
+			my $key = $1;
+			my $value = $2;
+			$value =~ s/\s+$//;
+			$Table->{$current}->{$key} = $value;
+		}
+	}
+	close (PURLTABLE);
+}
