@@ -6,6 +6,9 @@ my $parser = XML::LibXML->new();
 use XML::LibXML::XPathContext;
 use File::Path;
 use File::stat;
+use Getopt::Std;
+
+getopts('r'); # side effect; sets opt_r
 
 mkpath "$ENV{HOME}/workspace/DC";
 
@@ -17,6 +20,7 @@ setpriority( "PRIO_PROCESS", 0 , "19") || die ("$0: $! not nice\n");
 #default (no ARGVs) is to grab METS out of this XTF directory
 my $texts_data = $ENV{XTF_DATA} || "$ENV{HOME}/data/xtf/data";
 my $mets_base = $ENV{METSBASE} || "$ENV{HOME}/branches/production/mets-support";
+my $regen = $opt_r;
 
 #read driver file
 die ("No driver.xml in $mets_base") unless -e "$mets_base/driver.xml";
@@ -118,6 +122,7 @@ sub upfile {
 	if ( -e "$mets_base/$dcx" && $dcx ){
 		my $dcxStat = stat("$mets_base/$dcx");
 		if ( 	not(-e $out) ||				# if the .dc.xml is not there yet OR
+                        $regen ||
 			( $METSstat->mtime > $DCstat->mtime  	# METS file is newer than DC file
 			|| $dcxStat->mtime > $DCstat->mtime ) 	# OR XSLT is newer than the DC file
 		   )
