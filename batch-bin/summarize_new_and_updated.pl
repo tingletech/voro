@@ -396,7 +396,7 @@ print SUMM "<br/><table border=\"1\"><tr><td><table>\n";
 print SUMM "<tr><td colspan=\"2\"><h2>Updated EAD by Contributing Institution:",
 	"</h2></td></tr>\n";
 print SUMM "<tr><td>Institution</td><td>Count</td></tr>\n";
-$email_digest_msg .= "Updated EAD by Contributing Institution:\n\n";
+$email_digest_msg .= "Updated EAD by Contributing Institution:\n";
 $email_digest_msg .= "Institution\tCount\n";
 $total = 0;
 foreach $type_specific (sort keys %{$counts{"weekly-updated-ead"}}) {
@@ -412,7 +412,7 @@ print SUMM "</table></td><tr></table>\n";
 print SUMM "<br/><table border=\"1\"><tr><td><table>\n";
 print SUMM "<tr><td colspan=\"2\"><h2>New METS by PROFILE:</h2></td></tr>\n";
 print SUMM "<tr><td>PROFILE</td><td>Count</td></tr>\n";
-$email_digest_msg .= "New METS by PROFILE:\n\n";
+$email_digest_msg .= "New METS by PROFILE:\n";
 $email_digest_msg .= "PROFILE\tCount\n";
 $total = 0;
 foreach $type_specific (sort keys %{$counts{"weekly-new-mets"}}) {
@@ -429,7 +429,7 @@ print SUMM "<br/><table border=\"1\"><tr><td><table>\n";
 print SUMM "<tr><td colspan=\"2\"><h2>Updated METS by PROFILE:</h2></td>",
 	"</tr>\n";
 print SUMM "<tr><td>PROFILE</td><td>Count</td></tr>\n";
-$email_digest_msg .= "Updated METS by PROFILE:\n\n";
+$email_digest_msg .= "Updated METS by PROFILE:\n";
 $email_digest_msg .= "PROFILE\tCount\n";
 $total = 0;
 foreach $type_specific (sort keys %{$counts{"weekly-updated-mets"}}) {
