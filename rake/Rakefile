@@ -25,6 +25,7 @@ task :default do |t|
 	Rake::Task["ead:oisindex"].invoke
 	Rake::Task["xtf:metsark"].invoke
  	Rake::Task["ingest-stats"].invoke
+ 	Rake::Task["report-results"].invoke
 end
 
 # re-use the TWS wrappers and dependencies
@@ -113,4 +114,26 @@ end
 desc "run the ingest stats reports"
 task "ingest-stats" do |t|
 	sh "#{ENV['HOME']}/branches/#{branch}/voro/batch-bin/voro_ingest_stats.pl"
+end
+
+desc "report the time of the finished index to voro.posterous.com"
+task "report-results" do
+    require 'socket'
+    hostname = Socket.gethostname
+    from_addr = "dsc@#{hostname}.cdlib.org"
+    to_addrs = ["mark.redar@ucop.edu", "voro@posterous.com"]
+    to_addrs_flat = to_addrs.map{ |x| "#{x}, " }.compact
+    start_time = File.ctime("#{ENV['HOME']}/log/nightly.lock")
+    index_time = File.mtime(Dir.glob("#{ENV['HOME']}/branches/#{branch}/xtf/index/*.cfs")[0])
+    msg = <<EOM
+From: <#{from_addr}>
+To: <#{to_addrs_flat}>
+Subject: EADs posted before #{start_time} now in the OAC index.
+
+Index was completed at #{index_time}.
+EOM
+    require 'net/smtp'
+    Net::SMTP.start('localhost', 25) do |smtp|
+        smtp.send_message msg, from_addr, to_addrs
+    end
 end
