@@ -124,7 +124,7 @@ sub load_mysql_data;
 sub date_in_range;
 sub load_dao_or_daogrp_info;
 sub build_report_string;
-sub get_index_datetime;
+sub get_index_date_formatted;
 
 # Get the command name for error messages.
 $pos = rindex($0, "/");
@@ -376,8 +376,8 @@ print SUMM "<tr><td colspan=\"2\"><h2>New EAD by Contributing Institution:",
 	"</h2></td></tr>\n";
 
 print SUMM "<tr><td>Institution</td><td>Count</td></tr>\n";
-$email_digest_msg = "A new index has been created as of ";
-$email_digest_msg .= get_index_datetime()."\n";
+$email_digest_msg = "A new index was created at ";
+$email_digest_msg .= get_index_date_formatted()."\n\n";
 $email_digest_msg .= "New EAD by Contributing Institution\n";
 $email_digest_msg .= "Institution\tCount\n";
 
@@ -389,14 +389,14 @@ foreach $type_specific (sort keys %{$counts{"weekly-new-ead"}}) {
 	$email_digest_msg .= "$type_specific\t$count\n";
 	}
 print SUMM "<tr><td colspan=\"2\">Total: $total</td></tr>\n";
-$email_digest_msg .= "Total: $total\n";
+$email_digest_msg .= "Total: $total\n\n";
 print SUMM "</table></td><tr></table>\n";
 
 print SUMM "<br/><table border=\"1\"><tr><td><table>\n";
 print SUMM "<tr><td colspan=\"2\"><h2>Updated EAD by Contributing Institution:",
 	"</h2></td></tr>\n";
 print SUMM "<tr><td>Institution</td><td>Count</td></tr>\n";
-$email_digest_msg .= "Updated EAD by Contributing Institution:\n";
+$email_digest_msg .= "Updated EAD by Contributing Institution:\n\n";
 $email_digest_msg .= "Institution\tCount\n";
 $total = 0;
 foreach $type_specific (sort keys %{$counts{"weekly-updated-ead"}}) {
@@ -406,13 +406,13 @@ foreach $type_specific (sort keys %{$counts{"weekly-updated-ead"}}) {
 	$email_digest_msg .= "$type_specific\t$count\n";
 	}
 print SUMM "<tr><td colspan=\"2\">Total: $total</td></tr>\n";
-$email_digest_msg .= "Total: $total\n";
+$email_digest_msg .= "Total: $total\n\n";
 print SUMM "</table></td><tr></table>\n";
 
 print SUMM "<br/><table border=\"1\"><tr><td><table>\n";
 print SUMM "<tr><td colspan=\"2\"><h2>New METS by PROFILE:</h2></td></tr>\n";
 print SUMM "<tr><td>PROFILE</td><td>Count</td></tr>\n";
-$email_digest_msg .= "New METS by PROFILE:\n";
+$email_digest_msg .= "New METS by PROFILE:\n\n";
 $email_digest_msg .= "PROFILE\tCount\n";
 $total = 0;
 foreach $type_specific (sort keys %{$counts{"weekly-new-mets"}}) {
@@ -422,14 +422,14 @@ foreach $type_specific (sort keys %{$counts{"weekly-new-mets"}}) {
 	$email_digest_msg .= "$type_specific\t$count\n";
 	}
 print SUMM "<tr><td colspan=\"2\">Total: $total</td></tr>\n";
-$email_digest_msg .= "Total: $total\n";
+$email_digest_msg .= "Total: $total\n\n";
 print SUMM "</table></td><tr></table>\n";
 
 print SUMM "<br/><table border=\"1\"><tr><td><table>\n";
 print SUMM "<tr><td colspan=\"2\"><h2>Updated METS by PROFILE:</h2></td>",
 	"</tr>\n";
 print SUMM "<tr><td>PROFILE</td><td>Count</td></tr>\n";
-$email_digest_msg .= "Updated METS by PROFILE:\n";
+$email_digest_msg .= "Updated METS by PROFILE:\n\n";
 $email_digest_msg .= "PROFILE\tCount\n";
 $total = 0;
 foreach $type_specific (sort keys %{$counts{"weekly-updated-mets"}}) {
@@ -439,15 +439,14 @@ foreach $type_specific (sort keys %{$counts{"weekly-updated-mets"}}) {
 	$email_digest_msg .= "$type_specific\t$count\n";
 	}
 print SUMM "<tr><td colspan=\"2\">Total: $total</td></tr>\n";
-$email_digest_msg .= "Total: $total\n";
+$email_digest_msg .= "Total: $total\n\n";
 print SUMM "</table></td><tr></table>\n";
 
 print SUMM "</body></html>\n";
 close(SUMM);
 
-print $email_digest_msg;
 email_msg('mark.redar@ucop.edu', $email_digest_msg);
-exit;
+email_msg('voro@posterous.com', $email_digest_msg);
 
 # Write out the weekly detail files.
 foreach $new_or_updated ("new", "updated") {
@@ -952,7 +951,7 @@ sub build_report_string {
 # Get the xtf location from XTF_HOME env var
 use File::stat;
 use Time::localtime;
-sub get_index_datetime{
+sub get_index_date_formatted{
     my $formatted_date_string;
     my $index_file = `ls $ENV{'XTF_HOME'}/index/*.cfs`;
     chomp($index_file);
@@ -964,12 +963,13 @@ sub email_msg{
 	my $to_addr = $_[0];
 	my $msg = $_[1];
     #my $from_addr = "dsc@$ENV{'HOSTNAME'}.cdlib.org";
+    my $index_date = get_index_date_formatted();
 	# Attempt to send mail.
 	open(MAIL, "|-", "/usr/lib/sendmail -t") ||
-		die "$c:  unable to send mail, the attempt to open a pipe ",
+		print "Unable to send mail, the attempt to open a pipe ",
 			"to /usr/lib/sendmail failed, $!, stopped";
 	print MAIL "To:  $to_addr\n";
-	print MAIL "Subject:  Stats report for latest index\n";
+	print MAIL "Subject:  Stats report for latest index - $index_date\n";
 	print MAIL "\n";
 	print MAIL $msg;
 	close(MAIL);
