@@ -125,15 +125,19 @@ task "report-results" do
     to_addrs_flat = to_addrs.map{ |x| "#{x}, " }.compact
     start_time = File.ctime("#{ENV['HOME']}/log/nightly.lock")
     index_time = File.mtime(Dir.glob("#{ENV['HOME']}/branches/#{branch}/xtf/index/*.cfs")[0])
-    msg = <<EOM
+    if "#{ENV['PRODUCTION']}" == 'true'
+        msg = <<EOM
 From: <#{from_addr}>
 To: <#{to_addrs_flat}>
-Subject: EADs posted before #{start_time} now in the OAC index.
+Subject: New index complete
 
-Index was completed at #{index_time}.
+EADs submitted and processed with voroEAD before #{start_time.strftime("%m/%d/%Y at %I:%M%p")} should be online.
+
+Index was completed at #{index_time.strftime("%m/%d/%Y at %I:%M%p")}.
 EOM
-    require 'net/smtp'
-    Net::SMTP.start('localhost', 25) do |smtp|
-        smtp.send_message msg, from_addr, to_addrs
+        require 'net/smtp'
+        Net::SMTP.start('localhost', 25) do |smtp|
+            smtp.send_message msg, from_addr, to_addrs
+        end
     end
 end
