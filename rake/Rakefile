@@ -79,7 +79,8 @@ namespace :sync do
 		cvs_opts = "-v --cvs-exclude --links --recursive --times"
 		sh "rsync #{cvs_opts} #{production}:/voro/data/oac-ead/prime2002/ #{ENV['HOME']}/data/in/oac-ead/prime2002"
 		sh "rsync #{cvs_opts} #{production}:/voro/data/oac-ead/submission/ #{ENV['HOME']}/data/in/oac-ead/submission"
-		sh "rsync #{cvs_opts} #{production}:/voro/XTF/data-nonark/marc/ #{ENV['HOME']}/data/xtf/data-nonark/marc"
+		sh "rsync #{cvs_opts} #{production}:/voro/data/oac-ead/remove/ #{ENV['HOME']}/data/in/oac-ead/remove"
+		sh "rsync #{cvs_opts} #{production}:/voro/XTF/data-nonark/marc/ #{ENV['HOME']}/data/xtf/data/marc"
         end
 end
 
