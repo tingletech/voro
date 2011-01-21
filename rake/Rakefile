@@ -24,6 +24,7 @@ task :default do |t|
 	Rake::Task["ead:pdfsweep"].invoke
 	Rake::Task["ead:oisindex"].invoke
 	Rake::Task["xtf:metsark"].invoke
+ 	Rake::Task["ead:pdfgen"].invoke
  	Rake::Task["ingest-stats"].invoke
  	Rake::Task["report-results"].invoke
 end
@@ -66,6 +67,11 @@ namespace :ead do
 		sh "#{ENV['HOME']}/branches/#{branch}/voro/objinfo/oisIndexer.py"
                 # sh "#{ENV['PREFIX']}/bin/python 
 		# /voro/code/oac4/ois/oisIndexer.py  >&! /voro/code/oac4/ois/oisIndexer.log
+	end
+
+	desc "Create new pdfs for submitted EADs"
+	task :pdfgen do |t|
+		sh "#{ENV['HOME']}/branches/#{branch}/oac-ead-to-pdf/scripts/run_by_size_with_excludelist.sh"
 	end
 
 end
