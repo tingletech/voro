@@ -71,7 +71,7 @@ namespace :ead do
 
 	desc "Create new pdfs for submitted EADs"
 	task :pdfgen do |t|
-		sh "#{ENV['HOME']}/branches/#{branch}/oac-ead-to-pdf/scripts/run_by_size_with_excludelist.sh"
+		sh "#{ENV['HOME']}/branches/#{branch}/oac-ead-to-pdf/scripts/run_by_size_with_excludelist-pp.sh"
 	end
 
 end
