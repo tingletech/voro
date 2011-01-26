@@ -131,8 +131,8 @@ desc "report the time of the finished index to voro.posterous.com"
 task "report-results" do
     require 'socket'
     hostname = Socket.gethostname
-    from_addr = "dsc@#{hostname}.cdlib.org"
-    to_addrs = ["mark.redar@ucop.edu", "voro@posterous.com"]
+    from_addr = "dsc@#{hostname}"
+    to_addrs = "voro@posterous.com"
     to_addrs_flat = to_addrs.map{ |x| "#{x}, " }.compact
     start_time = File.ctime("#{ENV['HOME']}/log/nightly.lock")
     index_time = File.mtime(Dir.glob("#{ENV['HOME']}/branches/#{branch}/xtf/index/*.cfs")[0])
