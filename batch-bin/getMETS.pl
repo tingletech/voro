@@ -125,6 +125,7 @@ for (@ARGV) {
 	# figure out ARK
 	my $ark = $xc->findvalue('/mets:mets/@OBJID');
 	$ark =~ s,^(.*)ark:/,ark:/,;
+	$ark =~ s/\s+$//;            # remove trailing whitespace
 
 	# validate ARK???  at least its got to have one!!
 	# should do something better than die silently...
