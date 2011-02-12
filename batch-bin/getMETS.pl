@@ -311,8 +311,9 @@ for (@ARGV) {
 			$fixMODS->removeChild($wrongNote);
 		}
 		# also check for mdRef to try to make sure it is redundent?
+                my ($mdRefRelatedItem) = $xc->findnodes('/mets:mets/mets:dmdSec/mets:mdRef[@MDTYPE="EAD"][@xlink:href]');
 		my ($redundantRelatedItem) = $xc->findnodes('(/mets:mets/mets:dmdSec/mets:mdWrap/mets:xmlData/mods3:mods)[1]/mods3:relatedItem[@type="host"]');
-		if ($redundantRelatedItem) {
+		if ($redundantRelatedItem and $mdRefRelatedItem) {
 			$fixMODS->removeChild($redundantRelatedItem);
 		}
 	}
