@@ -43,7 +43,7 @@
 #		5 - optional - the path to use to access a MySQL client
 #			command.  the default (if this parameter is omitted
 #			or of length zero) is
-#			"/cdlcommon/products/mysql/bin/mysql".
+#			"/dsc/local/bin/mysql".
 #
 #		6 - optional - the path to the finding aids.  the default
 #			(if this parameter is omitted or of length zero) is
@@ -206,7 +206,7 @@ if ((scalar(@ARGV) >= 5) && (length($ARGV[4]) > 0)) {
 	$mysql_command = $ARGV[4];
 	}
 else {
-	$mysql_command = "/cdlcommon/products/mysql/bin/mysql";
+	$mysql_command = "/dsc/local/bin/mysql";
 	}
 
 if ((scalar(@ARGV) >= 6) && (length($ARGV[5]) > 0)) {
