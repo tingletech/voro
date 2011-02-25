@@ -32,7 +32,7 @@
 #			omitted or of length zero, use "oac4devro".
 #		10 - optional - the location of the "mysql" command binary.
 #			if this parameter is omitted or of length zero,
-#			use "/cdlcommon/products/mysql/bin/mysql".
+#			use "/dsc/local/bin/mysql";
 #
 # Note:		I tried to install DBD::mysql, but ran into a lot of trouble,
 #		and gave up.
@@ -171,7 +171,7 @@ if ((scalar(@ARGV) >= 10) && (length($ARGV[9]) > 0)) {
 	$mysql_command = $ARGV[9];
 	}
 else {
-	$mysql_command = "/cdlcommon/products/mysql/bin/mysql";
+	$mysql_command = "/dsc/local/bin/mysql";
 	}
 if (scalar(@ARGV) > 10) {
 	print STDERR "$c:  this command uses only the first 10 command line ",
