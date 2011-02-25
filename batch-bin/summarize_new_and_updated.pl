@@ -43,7 +43,7 @@
 #		5 - optional - the path to use to access a MySQL client
 #			command.  the default (if this parameter is omitted
 #			or of length zero) is
-#			"/dsc/local/bin/mysql";
+#			"/dsc/local/bin/mysql".
 #
 #		6 - optional - the path to the finding aids.  the default
 #			(if this parameter is omitted or of length zero) is

@@ -32,7 +32,7 @@
 #			omitted or of length zero, use "oac4devro".
 #		10 - optional - the location of the "mysql" command binary.
 #			if this parameter is omitted or of length zero,
-#			use "/dsc/local/bin/mysql";
+#			use "/dsc/local/bin/mysql".
 #
 # Note:		I tried to install DBD::mysql, but ran into a lot of trouble,
 #		and gave up.
