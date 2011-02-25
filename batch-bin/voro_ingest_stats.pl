@@ -96,6 +96,7 @@ else {
 	$command_one_short = "find_new_and_updated.pl";
 	$command_one = $nearby . $command_one_short;
 	$command_one_param = "-";
+	$command_one_param = "";
 	}
 
 if ((scalar(@ARGV) >= 2) && (length($ARGV[1]) > 0)) {
