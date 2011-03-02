@@ -55,9 +55,9 @@ sub poi2file {
         my $poi = shift;
         $poi =~ s,[.|/],,g;
         my $dir = substr($poi, -2);
-        $poi =~ s|ark:13030|$allroot/mets/$dir/|;
-		if (! -e "$eadroot/mets/$dir" ) {
-			mkpath("$allroot/mets/$dir");
+        $poi =~ s|ark:13030(.*)$|$allroot/data/13030/$dir/$1/$1|;
+		if (! -e "$allroot/data/13030/$dir/$1" ) {
+			mkpath("$allroot/data/13030/$dir/$1");
 		}
         return "$poi";
 }

@@ -21,10 +21,12 @@ task :default do |t|
 	Rake::Task["sync:pullfromproduction"].execute
 	Rake::Task["ead:makemets"].invoke
 	Rake::Task[:DCme].invoke
+ 	Rake::Task["ead:pdfgen"].invoke
 	Rake::Task["ead:pdfsweep"].invoke
 	Rake::Task["ead:oisindex"].invoke
 	Rake::Task["xtf:metsark"].invoke
  	Rake::Task["ingest-stats"].invoke
+ 	Rake::Task["report-results"].invoke
 end
 
 # re-use the TWS wrappers and dependencies
@@ -67,6 +69,11 @@ namespace :ead do
 		# /voro/code/oac4/ois/oisIndexer.py  >&! /voro/code/oac4/ois/oisIndexer.log
 	end
 
+	desc "Create new pdfs for submitted EADs"
+	task :pdfgen do |t|
+		sh "#{ENV['HOME']}/branches/#{branch}/oac-ead-to-pdf/scripts/run_by_size_with_excludelist-pp.sh"
+	end
+
 end
 
 # This replaces rsync.sh and RSYNCDATA
@@ -78,7 +85,8 @@ namespace :sync do
 		cvs_opts = "-v --cvs-exclude --links --recursive --times"
 		sh "rsync #{cvs_opts} #{production}:/voro/data/oac-ead/prime2002/ #{ENV['HOME']}/data/in/oac-ead/prime2002"
 		sh "rsync #{cvs_opts} #{production}:/voro/data/oac-ead/submission/ #{ENV['HOME']}/data/in/oac-ead/submission"
-		sh "rsync #{cvs_opts} #{production}:/voro/XTF/data-nonark/marc/ #{ENV['HOME']}/data/xtf/data-nonark/marc"
+		sh "rsync #{cvs_opts} #{production}:/voro/data/oac-ead/remove/ #{ENV['HOME']}/data/in/oac-ead/remove"
+		sh "rsync #{cvs_opts} #{production}:/voro/XTF/data-nonark/marc/ #{ENV['HOME']}/data/xtf/data/marc"
         end
 end
 
@@ -113,4 +121,30 @@ end
 desc "run the ingest stats reports"
 task "ingest-stats" do |t|
 	sh "#{ENV['HOME']}/branches/#{branch}/voro/batch-bin/voro_ingest_stats.pl"
+end
+
+desc "report the time of the finished index to voro.posterous.com"
+task "report-results" do
+    require 'socket'
+    hostname = Socket.gethostname
+    from_addr = "dsc@#{hostname}"
+    to_addrs = "voro@posterous.com"
+    to_addrs_flat = to_addrs.map{ |x| "#{x}, " }.compact
+    start_time = File.ctime("#{ENV['HOME']}/log/nightly.lock")
+    index_time = File.mtime(Dir.glob("#{ENV['HOME']}/branches/#{branch}/xtf/index/*.cfs")[0])
+    if "#{ENV['PRODUCTION']}" == 'true'
+        msg = <<EOM
+From: <#{from_addr}>
+To: <#{to_addrs_flat}>
+Subject: New index complete
+
+EADs submitted and processed with voroEAD before #{start_time.strftime("%m/%d/%Y at %I:%M%p")} should be online.
+
+Index was completed at #{index_time.strftime("%m/%d/%Y at %I:%M%p")}.
+EOM
+        require 'net/smtp'
+        Net::SMTP.start('localhost', 25) do |smtp|
+            smtp.send_message msg, from_addr, to_addrs
+        end
+    end
 end

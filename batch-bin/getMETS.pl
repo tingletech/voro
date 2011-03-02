@@ -9,19 +9,21 @@ use Image::Size;
 
 my %mime2ext = ( 'image/jpeg' => 'jpg',
 		 'video/quicktime' => 'mov' );
-
-my $localBase = "/dsc/data/in/new";
+#my $localBase = "/dsc/data/in/new";
+my $localBase = "/dsc/data/xtf";
 my $urlBase = "http://content.cdlib.org/dynaxml"; 
 our $validate_command = "/voro/local/bin/validate";
 our $gif2png_command = "/voro/local/bin/gif2png -O";
 our $pdftotext_command = "/cdlcommon/products/xpdf-3.02/bin/pdftotext";
 
+my $xsltBase = "/dsc/branches/production/voro/xslt/";
+
 # turn UCSD structMap to UCB structMap
-my $trimXslt = "/voro/code/htdocs/xslt/structMapTrim.xsl";
+my $trimXslt = "$xsltBase/structMapTrim.xsl";
 # turn UCB structMap to 7train structMap
-my $buffXslt = "/voro/code/htdocs/xslt/structMapBuff.xsl";
+my $buffXslt = "$xsltBase/structMapBuff.xsl";
 # generate Krik's XTF structMap from a TEI (not used any more; should remove this?)
-my $teiBuff = "/voro/code/htdocs/xslt/teiBuff.xsl";
+my $teiBuff = "$xsltBase/teiBuff.xsl";
 
 my $imgsize;
 
@@ -123,6 +125,7 @@ for (@ARGV) {
 	# figure out ARK
 	my $ark = $xc->findvalue('/mets:mets/@OBJID');
 	$ark =~ s,^(.*)ark:/,ark:/,;
+	$ark =~ s/\s+$//;            # remove trailing whitespace
 
 	# validate ARK???  at least its got to have one!!
 	# should do something better than die silently...
@@ -230,9 +233,9 @@ for (@ARGV) {
 			};
 			$actionTaken = "R";
 		} else {
-			print STDERR "$0: the METS Document file has changes\n";
+			#print STDERR "$0: the METS Document file has changes\n";
 			## save update  $sourceMets
-			print STDERR "$sourceMets";
+			# print STDERR "$sourceMets";
 			$doc->toFile($sourceMets);
 			$actionTaken = "U";
 		}
@@ -260,11 +263,11 @@ for (@ARGV) {
 	# now that we have a copy of the METS locally, 
 	# let's validate it for good luck
 
-	my $message = `$validate_command $sourceMets`;
-	my $exit = $? >> 8;
+	# my $message = `$validate_command $sourceMets`;
+	# my $exit = $? >> 8;
 
-	print $message if ( $exit != 0 );
-	next if ( ($exit != 0) && (!$forgive_mets) );
+	# print $message if ( $exit != 0 );
+	# next if ( ($exit != 0) && (!$forgive_mets) );
 	
 	$typeNode->setValue($type) if $typeNode;
  	
@@ -309,8 +312,9 @@ for (@ARGV) {
 			$fixMODS->removeChild($wrongNote);
 		}
 		# also check for mdRef to try to make sure it is redundent?
+                my ($mdRefRelatedItem) = $xc->findnodes('/mets:mets/mets:dmdSec/mets:mdRef[@MDTYPE="EAD"][@xlink:href]');
 		my ($redundantRelatedItem) = $xc->findnodes('(/mets:mets/mets:dmdSec/mets:mdWrap/mets:xmlData/mods3:mods)[1]/mods3:relatedItem[@type="host"]');
-		if ($redundantRelatedItem) {
+		if ($redundantRelatedItem and $mdRefRelatedItem) {
 			$fixMODS->removeChild($redundantRelatedItem);
 		}
 	}
@@ -339,7 +343,7 @@ for (@ARGV) {
 
 	# the loop goes through the file section, collecting files
 	foreach my $context ($filenodes->get_nodelist) {
-		print Dumper $context->toString;
+		#print Dumper $context->toString;
 		# harvestFileNode alters $context (passed by reference)
 		# it also alters $xc or $root
 		harvestFileNode(\$xc, \$context, \$ark, \$cacheInfo, $filesBaseName, $objectBaseName, $_);
