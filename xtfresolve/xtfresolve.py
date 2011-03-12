@@ -90,6 +90,7 @@ def application(environ, start_response):
     except IOError, e:
         status = '404 NOT FOUND'
         output = '<h1>No file found for poi</h1>'
+        return report_error(start_response, status, output)
     doc = etree.parse(foo)
     xpath = ''.join(('(/m:mets/m:fileSec//m:file[@ID="', qs['fileID'][0],
                      '"])[1]/m:FLocat[1]/@*[local-name() = \'href\']'))
