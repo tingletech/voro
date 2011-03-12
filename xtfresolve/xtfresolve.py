@@ -15,6 +15,7 @@ def poi2file(poi):
     poi = poi.replace('.','')
     dir = poi[-2:]
     #$poi =~ s|ark:(\d\d\d\d\d)(.*)|/texts/data/$1/$dir/$2/$2|;
+    #TODO: make poi parse smarter
     result = re.match('ark:(\d\d\d\d\d)(.*)', poi)
     fpath = ''.join(('/dsc/data/xtf/data/', result.group(1), '/', dir, '/',
                     result.group(2), '/', result.group(2), ))
@@ -84,7 +85,11 @@ def application(environ, start_response):
         output = '<h1>NO fileID Query paramter</h1>'
         return report_error(start_response, status, output)
     fname = ''.join((poi2file(qs['POI'][0]), '.mets.xml'))
-    foo = open(fname)
+    try: 
+    	foo = open(fname)
+    except IOError, e:
+        status = '404 NOT FOUND'
+        output = '<h1>No file found for poi</h1>'
     doc = etree.parse(foo)
     xpath = ''.join(('(/m:mets/m:fileSec//m:file[@ID="', qs['fileID'][0],
                      '"])[1]/m:FLocat[1]/@*[local-name() = \'href\']'))
@@ -92,6 +97,10 @@ def application(environ, start_response):
     namespaces = { 'm': 'http://www.loc.gov/METS/',
                    'xlink': 'http://www.w3.org/TR/xlink'}
     node = doc.xpath(xpath, namespaces=namespaces)  
+    if not len(node):
+        status = '404 NOT FOUND'
+        output = '<h1>NO mets fileSec found</h1>'
+        return report_error(start_response, status, output)
     # what to do if node list len > 1?
     fileurl = re.sub('\s', '+', node[0])
     # replace host with CDN_HOSTNAME
