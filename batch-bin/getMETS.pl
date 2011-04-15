@@ -13,7 +13,7 @@ my %mime2ext = ( 'image/jpeg' => 'jpg',
 my $localBase = "/dsc/data/xtf";
 my $urlBase = "http://content.cdlib.org/dynaxml"; 
 our $validate_command = "/voro/local/bin/validate";
-our $gif2png_command = "/voro/local/bin/gif2png -O";
+our $gif2png_command = "/dsc/local/bin/gif2png -O";
 our $pdftotext_command = "/cdlcommon/products/xpdf-3.02/bin/pdftotext";
 
 my $xsltBase = "/dsc/branches/production/voro/xslt/";
@@ -28,8 +28,8 @@ my $teiBuff = "$xsltBase/teiBuff.xsl";
 my $imgsize;
 
 # if carefree, then processing goes forward, even if input has not changed
-my $carefree = 1;
-my $regen = 1;
+my $carefree = 0;
+my $regen = 0;
 my $forgive_mets = 0;
 my $forgive_tei = 0;
 
