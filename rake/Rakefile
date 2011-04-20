@@ -82,7 +82,7 @@ namespace :sync do
         desc "pull files from production TEMPORARY"
 	task :pullfromproduction do |t|
 		production = "voro@voro.cdlib.org"
-		cvs_opts = "-v --cvs-exclude --links --recursive --times"
+		cvs_opts = "-v -u --cvs-exclude --links --recursive --times"
 		sh "rsync #{cvs_opts} #{production}:/voro/data/oac-ead/prime2002/ #{ENV['HOME']}/data/in/oac-ead/prime2002"
 		sh "rsync #{cvs_opts} #{production}:/voro/data/oac-ead/submission/ #{ENV['HOME']}/data/in/oac-ead/submission"
 		sh "rsync #{cvs_opts} #{production}:/voro/data/oac-ead/remove/ #{ENV['HOME']}/data/in/oac-ead/remove"
